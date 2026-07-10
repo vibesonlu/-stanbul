@@ -1,1 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokerFlow // Agency CRM</title>
+    <!-- Tailwind CSS for modern, adaptive UI styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+    <!-- Mobile Top Navigation Header -->
+    <header class="sticky top-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center z-40">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">BrokerFlow</h1>
+        </div>
+        <button onclick="openModal()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
+            ➕ Add Listing
+        </button>
+    </header>
+
+    <!-- Metrics Strip -->
+    <section class="p-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-slate-950 border border-slate-800/60 p-3 rounded-xl">
+            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Pipeline</p>
+            <p id="metric-total-value" class="text-lg font-extrabold text-slate-100 mt-0.5">$0.0M</p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800/60 p-3 rounded-xl">
+            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Est. Commission (3%)</p>
+            <p id="metric-commission" class="text-lg font-extrabold text-emerald-400 mt-0.5">$0K</p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800/60 p-3 rounded-xl">
+            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Listings</p>
+            <p id="metric-count" class="text-lg font-extrabold text-cyan-400 mt-0.5">0 Properties</p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800/60 p-3 rounded-xl">
+            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Avg Days on Market</p>
+            <p class="text-lg font-extrabold text-purple-400 mt-0.5">14 Days</p>
+        </div>
+    </section>
+
+    <!-- Interactive Pipeline Board Wrapper -->
+    <main class="px-4 pb-12">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-3">Deal Stages & Inventory</h2>
+        
+        <!-- Mobile Horizontally Scrollable Board -->
+        <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory">
+            
+            <!-- Column 1: New / Active Listings -->
+            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex flex-col min-h-[450px]">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold text-cyan-400 tracking-wide uppercase">Active Listings</span>
+                    <span id="badge-active" class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-active" class="flex-1 space-y-3"></div>
+            </div>
+
+            <!-- Column 2: Offer Received -->
+            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex flex-col min-h-[450px]">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold text-amber-400 tracking-wide uppercase">Offer Received</span>
+                    <span id="badge-offer" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-offer" class="flex-1 space-y-3"></div>
+            </div>
+
+            <!-- Column 3: Under Contract -->
+            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800 rounded-xl p-3 flex flex-col min-h-[450px]">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold text-purple-400 tracking-wide uppercase">Under Contract</span>
+                    <span id="badge-contract" class="bg-purple-500/10 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="col-contract" class="flex-1 space-y-3"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal Form for Inputting New Properties -->
+    <div id="property-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl">
+            <h3 class="text-base font-bold text-slate-100 mb-4">Add Agency Property Listing</h3>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Property Title/Address</label>
+                    <input id="form-title" type="text" placeholder="e.g., 742 Evergreen Terrace" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
+                    <input id="form-price" type="number" placeholder="e.g., 450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Property Type</label>
+                    <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                        <option value="Single Family">🏡 Single Family</option>
+                        <option value="Modern Condo">🏢 Condo / Apartment</option>
+                        <option value="Luxury Villa">🌴 Luxury Villa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-2 justify-end mt-5 text-xs font-bold">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
+                <button onclick="submitListing()" class="px-4 py-2 bg-emerald-500 text-slate-950 rounded-lg shadow-lg shadow-emerald-500/20">Save Listing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Pipeline & Calculation System Logic -->
+    <script>
+        // In-memory array mirroring a live database architecture
+        let listings = [
+            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active" },
+            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer" },
+            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract" }
+        ];
+
+        function renderDashboard() {
+            // Clear prior columns
+            document.getElementById('col-active').innerHTML = '';
+            document.getElementById('col-offer').innerHTML = '';
+            document.getElementById('col-contract').innerHTML = '';
+
+            let totalValue = 0;
+            let counts = { active: 0, offer: 0, contract: 0 };
+
+            listings.forEach(item => {
+                totalValue += item.price;
+                counts[item.stage]++;
+
+                // Generate clean UI card components on-the-fly 
+                const cardHTML = `
+                    <div class="bg-slate-900 border border-slate-800/80 p-3.5 rounded-lg shadow-sm group">
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400">${item.type}</span>
+                            <button onclick="deleteListing(${item.id})" class="text-slate-600 hover:text-rose-400 text-xs transition-colors">🗑️</button>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-200 mt-2 line-clamp-1">${item.title}</h4>
+                        <p class="text-sm font-black text-slate-100 mt-1">$${item.price.toLocaleString()}</p>
+                        
+                        <!-- Mini Control Actions for Pipeline Stages -->
+                        <div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-between gap-1.5 text-[10px] font-bold">
+                            ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-2 py-1 rounded border border-cyan-500/10">⬅️ Stall</button>` : '<div class="w-1"></div>'}
+                            ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
+                            ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">Accept Contract ➡️</button>` : ''}
+                            ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1 flex items-center gap-1">✨ Near Close</span>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById(`col-${item.stage}`).innerHTML += cardHTML;
+            });
+
+            // Re-calculate financial aggregate states
+            document.getElementById('metric-total-value').innerText = `$${(totalValue / 1000000).toFixed(2)}M`;
+            document.getElementById('metric-commission').innerText = `$${Math.round((totalValue * 0.03) / 1000).toLocaleString()}K`;
+            document.getElementById('metric-count').innerText = `${listings.length} Properties`;
+            
+            // Update UI count badges
+            document.getElementById('badge-active').innerText = counts.active;
+            document.getElementById('badge-offer').innerText = counts.offer;
+            document.getElementById('badge-contract').innerText = counts.contract;
+        }
+
+        // Mutation Controllers
+        function updateStage(id, newStage) {
+            const index = listings.findIndex(p => p.id === id);
+            if (index !== -1) {
+                listings[index].stage = newStage;
+                renderDashboard();
+            }
+        }
+
+        function deleteListing(id) {
+            listings = listings.filter(p => p.id !== id);
+            renderDashboard();
+        }
+
+        function submitListing() {
+            const title = document.getElementById('form-title').value;
+            const price = parseInt(document.getElementById('form-price').value);
+            const type = document.getElementById('form-type').value;
+
+            if (!title || isNaN(price)) {
+                alert("Please fully enter details and pricing parameters.");
+                return;
+            }
+
+            listings.push({
+                id: Date.now(),
+                title: title,
+                price: price,
+                type: type,
+                stage: 'active'
+            });
+
+            closeModal();
+            renderDashboard();
+
+            // Reset inputs
+            document.getElementById('form-title').value = '';
+            document.getElementById('form-price').value = '';
+        }
+
+        // Modal Visibility Helpers
+        function openModal() { document.getElementById('property-modal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('property-modal').classList.add('hidden'); }
+
+        // Core App Initialization
+        renderDashboard();
+    </script>
+</body>
+</html>
 
