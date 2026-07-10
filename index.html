@@ -59,10 +59,7 @@
             
             <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                        <span class="text-xs font-bold text-cyan-400 tracking-wide uppercase">Active Listings</span>
-                    </div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span><span class="text-xs font-bold text-cyan-400 tracking-wide uppercase">Active Listings</span></div>
                     <span id="badge-active" class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
                 <div id="col-active" class="flex-1 space-y-3"></div>
@@ -70,10 +67,7 @@
 
             <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                        <span class="text-xs font-bold text-amber-400 tracking-wide uppercase">Offer Received</span>
-                    </div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span class="text-xs font-bold text-amber-400 tracking-wide uppercase">Offer Received</span></div>
                     <span id="badge-offer" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
                 <div id="col-offer" class="flex-1 space-y-3"></div>
@@ -81,10 +75,7 @@
 
             <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                        <span class="text-xs font-bold text-purple-400 tracking-wide uppercase">Under Contract</span>
-                    </div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-400"></span><span class="text-xs font-bold text-purple-400 tracking-wide uppercase">Under Contract</span></div>
                     <span id="badge-contract" class="bg-purple-500/10 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
                 <div id="col-contract" class="flex-1 space-y-3"></div>
@@ -96,39 +87,64 @@
     <div id="property-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl">
             <h3 class="text-sm font-bold text-slate-100 mb-4">Add Agency Property Listing</h3>
-            
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Title/Address</label>
-                    <input id="form-title" type="text" placeholder="e.g., 742 Evergreen Terrace" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <input id="form-title" type="text" placeholder="e.g., 742 Evergreen Terrace" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
-                    <input id="form-price" type="number" placeholder="e.g., 450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <input id="form-price" type="number" placeholder="e.g., 450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Image URL (Optional)</label>
-                    <input id="form-image" type="url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <input id="form-image" type="url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Type</label>
-                    <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                         <option value="Single Family">🏡 Single Family</option>
                         <option value="Modern Condo">🏢 Condo / Apartment</option>
                         <option value="Luxury Villa">🌴 Luxury Villa</option>
                     </select>
                 </div>
             </div>
-
             <div class="flex gap-2 justify-end mt-5 text-xs font-bold">
                 <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
-                <button onclick="submitListing()" class="px-4 py-2 bg-emerald-500 text-slate-950 rounded-lg shadow-lg shadow-emerald-500/20">Save Listing</button>
+                <button onclick="submitListing()" class="px-4 py-2 bg-emerald-500 text-slate-950 rounded-lg">Save Listing</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pitch-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+            <h3 class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-1.5">📢 Dynamic Pitch Configurator</h3>
+            
+            <div class="space-y-3 text-xs flex-1 overflow-y-auto pr-1">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Agent Name</label>
+                    <input id="pitch-agent" type="text" oninput="regeneratePitchText()" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Add Custom Client Note</label>
+                    <input id="pitch-note" type="text" oninput="regeneratePitchText()" placeholder="e.g., Highly motivated seller, quiet neighborhood..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Live Copy Preview</label>
+                    <textarea id="pitch-textarea" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none leading-relaxed"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-2 justify-end mt-4 text-xs font-bold shrink-0">
+                <button onclick="closePitchModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Close</button>
+                <button onclick="executePitchShare()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 rounded-lg flex items-center gap-1 shadow-lg shadow-cyan-500/10">
+                    🚀 Share / Copy
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // High-quality backup Unsplash imagery based on specific property architectures
         const typeImages = {
             "Single Family": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80",
             "Modern Condo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80",
@@ -142,20 +158,61 @@
         ];
 
         let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
+        let activePitchData = null; // Holds temporary property contextual data for live generator adjustments
 
-        function saveToStorage() {
-            localStorage.setItem('brokerflow_listings', JSON.stringify(listings));
+        function saveToStorage() { localStorage.setItem('brokerflow_listings', JSON.stringify(listings)); }
+
+        // NEW: Open Pitch Customizer Overlay Panel Configuration
+        function openPitchModal(title, price, type) {
+            activePitchData = { title, price, type };
+            document.getElementById('pitch-note').value = '';
+            // Fetch cached agent profile name if available, default to "Agent Desk"
+            document.getElementById('pitch-agent').value = localStorage.getItem('brokerflow_agent_name') || '';
+            
+            regeneratePitchText();
+            document.getElementById('pitch-modal').classList.remove('hidden');
         }
 
-        // Feature: Text Pitch Copy Engine
-        function copyClientPitch(title, price, type) {
-            const pitch = `🎯 Hot New Market Listing!\n\n✨ Type: ${type}\n📍 Location: ${title}\n💰 Asking Price: $${price.toLocaleString()} USD\n\nContact our agency desk today to arrange an exclusive private showing. Let's make a deal!`;
+        function closePitchModal() { document.getElementById('pitch-modal').classList.add('hidden'); }
+
+        // NEW: Real-Time State Re-calculator for Pitch Form Template
+        function regeneratePitchText() {
+            if (!activePitchData) return;
+            const agentName = document.getElementById('pitch-agent').value.trim() || "Our Agent Desk";
+            const clientNote = document.getElementById('pitch-note').value.trim();
             
-            navigator.clipboard.writeText(pitch).then(() => {
-                alert("📋 Client WhatsApp pitch text successfully copied to clipboard!");
-            }).catch(err => {
-                alert("Could not copy layout text automatically.");
-            });
+            // Cache agent name for later use
+            if(agentName !== "Our Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
+
+            let message = `🎯 HOT MARKET LISTING!\n\n`;
+            message += `✨ Type: ${activePitchData.type}\n`;
+            message += `📍 Location: ${activePitchData.title}\n`;
+            message += `💰 Asking Price: $${activePitchData.price.toLocaleString()} USD\n`;
+            
+            if (clientNote) {
+                message += `\n💡 Broker Note: "${clientNote}"\n`;
+            }
+            
+            message += `\n💼 Connected via: ${agentName}\n`;
+            message += `Contact us today to arrange an exclusive private showing!`;
+            
+            document.getElementById('pitch-textarea').value = message;
+        }
+
+        // NEW: Mobile-Native System Share / Smart Clipboard fallback routine
+        function executePitchShare() {
+            const finalText = document.getElementById('pitch-textarea').value;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Property Pitch Information',
+                    text: finalText
+                }).catch(err => console.log("Share skipped or canceled"));
+            } else {
+                navigator.clipboard.writeText(finalText).then(() => {
+                    alert("📋 Copied custom pitch securely to device clipboard!");
+                });
+            }
         }
 
         function renderDashboard() {
@@ -179,8 +236,10 @@
                     totalValue += item.price;
                     counts[item.stage]++;
 
-                    // Select custom or automatic template graphic image fallback
                     const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
+
+                    // Escaping single quotes correctly for dynamic function inputs
+                    const safeTitle = item.title.replace(/'/g, "\\'");
 
                     const cardHTML = `
                         <div class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col">
@@ -189,18 +248,15 @@
                                 <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300 backdrop-blur-xs">${item.type}</span>
                                 <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px] transition-colors">🗑️</button>
                             </div>
-
                             <div class="p-3 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
                                     <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
                                 </div>
-
                                 <div class="mt-3 space-y-2">
-                                    <button onclick="copyClientPitch('${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.type}')" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-slate-300 flex items-center justify-center gap-1">
-                                        📢 Copy Client Pitch
+                                    <button onclick="openPitchModal('${safeTitle}', ${item.price}, '${item.type}')" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-cyan-400 flex items-center justify-center gap-1">
+                                        📢 Customize Client Pitch
                                     </button>
-
                                     <div class="pt-2 border-t border-slate-900 flex justify-between gap-1 text-[9px] font-bold">
                                         ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅️ Regress</button>` : '<div class="w-1"></div>'}
                                         ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
@@ -257,7 +313,7 @@
             const img = document.getElementById('form-image').value;
 
             if (!title || isNaN(price)) {
-                alert("Please complete the required pricing fields.");
+                alert("Please complete required fields.");
                 return;
             }
 
