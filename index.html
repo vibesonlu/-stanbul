@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrokerFlow Pro // Agency CRM</title>
+    <title>BrokerFlow Ultimate // Agency CRM</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body { -webkit-tap-highlight-color: transparent; }
@@ -16,7 +16,7 @@
     <header class="sticky top-0 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center z-40">
         <div class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">BrokerFlow <span class="text-xs text-slate-500 font-mono">PRO</span></h1>
+            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">BrokerFlow <span class="text-xs text-emerald-400 font-mono">ULTIMATE</span></h1>
         </div>
         <button onclick="openModal()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
             ➕ Add Listing
@@ -50,8 +50,7 @@
         </div>
         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
             <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Stage Distribution</p>
-            <div id="distribution-bar" class="w-full h-3 bg-slate-800 rounded-full mt-2 flex overflow-hidden">
-                </div>
+            <div id="distribution-bar" class="w-full h-3 bg-slate-800 rounded-full mt-2 flex overflow-hidden"></div>
         </div>
     </section>
 
@@ -108,6 +107,10 @@
                     <input id="form-price" type="number" placeholder="e.g., 450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
+                    <label class="block text-slate-400 font-medium mb-1">Property Image URL (Optional)</label>
+                    <input id="form-image" type="url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Type</label>
                     <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-emerald-500">
                         <option value="Single Family">🏡 Single Family</option>
@@ -125,22 +128,37 @@
     </div>
 
     <script>
-        // Seed initial mock data ONLY if the database is completely empty
+        // High-quality backup Unsplash imagery based on specific property architectures
+        const typeImages = {
+            "Single Family": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80",
+            "Modern Condo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80",
+            "Luxury Villa": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=400&q=80"
+        };
+
         const defaultSeed = [
-            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active" },
-            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer" },
-            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract" }
+            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "" },
+            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "" },
+            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "" }
         ];
 
-        // 1. Load data securely from localStorage persistent engine
         let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
 
         function saveToStorage() {
             localStorage.setItem('brokerflow_listings', JSON.stringify(listings));
         }
 
+        // Feature: Text Pitch Copy Engine
+        function copyClientPitch(title, price, type) {
+            const pitch = `🎯 Hot New Market Listing!\n\n✨ Type: ${type}\n📍 Location: ${title}\n💰 Asking Price: $${price.toLocaleString()} USD\n\nContact our agency desk today to arrange an exclusive private showing. Let's make a deal!`;
+            
+            navigator.clipboard.writeText(pitch).then(() => {
+                alert("📋 Client WhatsApp pitch text successfully copied to clipboard!");
+            }).catch(err => {
+                alert("Could not copy layout text automatically.");
+            });
+        }
+
         function renderDashboard() {
-            // Clear prior views
             document.getElementById('col-active').innerHTML = '';
             document.getElementById('col-offer').innerHTML = '';
             document.getElementById('col-contract').innerHTML = '';
@@ -152,7 +170,6 @@
             let counts = { active: 0, offer: 0, contract: 0 };
             let visibleCount = 0;
 
-            // Filter out listings based on real-time mobile touch configurations
             listings.forEach(item => {
                 const matchesSearch = item.title.toLowerCase().includes(searchKeyword);
                 const matchesType = (filterType === 'All' || item.type === filterType);
@@ -162,20 +179,35 @@
                     totalValue += item.price;
                     counts[item.stage]++;
 
+                    // Select custom or automatic template graphic image fallback
+                    const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
+
                     const cardHTML = `
-                        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-lg shadow-sm animate-fade-in">
-                            <div class="flex justify-between items-start gap-2">
-                                <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400">${item.type}</span>
-                                <button onclick="deleteListing(${item.id})" class="text-slate-600 hover:text-rose-400 text-xs transition-colors p-1">🗑️</button>
+                        <div class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col">
+                            <div class="w-full h-28 relative bg-slate-800">
+                                <img src="${finalImg}" alt="Property Image" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300 backdrop-blur-xs">${item.type}</span>
+                                <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px] transition-colors">🗑️</button>
                             </div>
-                            <h4 class="text-xs font-bold text-slate-200 mt-2 line-clamp-1">${item.title}</h4>
-                            <p class="text-sm font-black text-slate-100 mt-1">$${item.price.toLocaleString()}</p>
-                            
-                            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex justify-between gap-1.5 text-[10px] font-bold">
-                                ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-2 py-1 rounded border border-cyan-500/10">⬅️ Move Up</button>` : '<div class="w-1"></div>'}
-                                ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
-                                ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">Sign Contract ➡️</button>` : ''}
-                                ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1 flex items-center gap-1">✨ Closing Stage</span>` : ''}
+
+                            <div class="p-3 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
+                                    <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
+                                </div>
+
+                                <div class="mt-3 space-y-2">
+                                    <button onclick="copyClientPitch('${item.title.replace(/'/g, "\\'")}', ${item.price}, '${item.type}')" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-slate-300 flex items-center justify-center gap-1">
+                                        📢 Copy Client Pitch
+                                    </button>
+
+                                    <div class="pt-2 border-t border-slate-900 flex justify-between gap-1 text-[9px] font-bold">
+                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅️ Regress</button>` : '<div class="w-1"></div>'}
+                                        ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
+                                        ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">Sign Contract ➡️</button>` : ''}
+                                        ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1 flex items-center gap-0.5">✨ Closing</span>` : ''}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -183,7 +215,6 @@
                 }
             });
 
-            // 2. Compute dynamic CSS distribution bar calculations
             const totalVisible = visibleCount || 1; 
             const activePct = (counts.active / totalVisible) * 100;
             const offerPct = (counts.offer / totalVisible) * 100;
@@ -195,7 +226,6 @@
                 <div style="width: ${contractPct}%" class="bg-purple-400 transition-all duration-300"></div>
             `;
 
-            // Update numerical metrics strings
             document.getElementById('metric-total-value').innerText = `$${(totalValue / 1000000).toFixed(2)}M`;
             document.getElementById('metric-commission').innerText = `$${Math.round((totalValue * 0.03) / 1000).toLocaleString()}K`;
             document.getElementById('metric-count').innerText = `${visibleCount} of ${listings.length}`;
@@ -205,7 +235,6 @@
             document.getElementById('badge-contract').innerText = counts.contract;
         }
 
-        // Data Mutators linked directly to local storage hooks
         function updateStage(id, newStage) {
             const index = listings.findIndex(p => p.id === id);
             if (index !== -1) {
@@ -225,19 +254,21 @@
             const title = document.getElementById('form-title').value;
             const price = parseInt(document.getElementById('form-price').value);
             const type = document.getElementById('form-type').value;
+            const img = document.getElementById('form-image').value;
 
             if (!title || isNaN(price)) {
-                alert("Please add valid parameters.");
+                alert("Please complete the required pricing fields.");
                 return;
             }
 
-            listings.push({ id: Date.now(), title, price, type, stage: 'active' });
+            listings.push({ id: Date.now(), title, price, type, img, stage: 'active' });
             saveToStorage();
             closeModal();
             renderDashboard();
 
             document.getElementById('form-title').value = '';
             document.getElementById('form-price').value = '';
+            document.getElementById('form-image').value = '';
         }
 
         function openModal() { document.getElementById('property-modal').classList.remove('hidden'); }
