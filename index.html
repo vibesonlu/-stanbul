@@ -1,551 +1,617 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrokerFlow Ultimate // Agency CRM</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { -webkit-tap-highlight-color: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        [draggable="true"] {
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
+
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
 
-    <header class="sticky top-0 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center z-40">
+    <!-- Top Sticky Header -->
+    <header
+        class="sticky top-0 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 py-3 flex justify-between items-center z-40">
         <div class="flex items-center gap-2">
             <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-            <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">BrokerFlow <span class="text-xs text-emerald-400 font-mono">ULTIMATE</span></h1>
+            <h1
+                class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                BrokerFlow <span class="text-xs text-emerald-400 font-mono">ULTIMATE</span></h1>
         </div>
-        <button onclick="openModal()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
-            ➕ Add Listing
-        </button>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleLanguage()" id="lang-btn"
+                class="bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all text-slate-200 border border-slate-700 font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1">
+                🌐 EN
+            </button>
+            <button onclick="openModal()" id="ui-add-listing-btn"
+                class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1">
+                ➕ Add Listing
+            </button>
+        </div>
     </header>
 
+    <!-- Search & Filter Controls -->
     <section class="px-4 pt-4">
         <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 flex flex-col sm:flex-row gap-2">
-            <input id="search-bar" type="text" oninput="renderDashboard()" placeholder="🔍 Search by address or client..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
-            <select id="filter-type" onchange="renderDashboard()" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
-                <option value="All">All Types</option>
-                <option value="Single Family">🏡 Single Family</option>
-                <option value="Modern Condo">🏢 Condo / Apartment</option>
-                <option value="Luxury Villa">🌴 Luxury Villa</option>
+            <input id="search-bar" type="text" oninput="renderDashboard()" placeholder="🔍 Search..."
+                class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
+            <select id="filter-type" onchange="renderDashboard()"
+                class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
             </select>
         </div>
     </section>
 
+    <!-- Financial Analytics Dashboard Grid -->
     <section class="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl">
-            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Pipeline</p>
+            <p id="lbl-active-pipeline" class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active
+                Pipeline</p>
             <p id="metric-total-value" class="text-lg font-extrabold text-slate-100 mt-0.5">$0.00M</p>
         </div>
         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl">
-            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Est. Commission (3%)</p>
+            <p id="lbl-est-commission" class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Est.
+                Commission (3%)</p>
             <p id="metric-commission" class="text-lg font-extrabold text-emerald-400 mt-0.5">$0K</p>
         </div>
         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl">
-            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Filtered Listings</p>
+            <p id="lbl-filtered-listings" class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Filtered
+                Listings</p>
             <p id="metric-count" class="text-lg font-extrabold text-cyan-400 mt-0.5">0 / 0</p>
         </div>
         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
-            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Stage Distribution</p>
+            <p id="lbl-stage-distribution" class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Stage
+                Distribution</p>
             <div id="distribution-bar" class="w-full h-3 bg-slate-800 rounded-full mt-2 flex overflow-hidden"></div>
         </div>
     </section>
 
+    <!-- Kanban Stage Board Grid -->
     <main class="px-4 pb-12">
         <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory">
-            
-            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
+
+            <!-- Column 1 -->
+            <div
+                class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span><span class="text-xs font-bold text-cyan-400 tracking-wide uppercase">Active Listings</span></div>
-                    <span id="badge-active" class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        <span id="col-title-active"
+                            class="text-xs font-bold text-cyan-400 tracking-wide uppercase">Active Listings</span>
+                    </div>
+                    <span id="badge-active"
+                        class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
-                <div id="col-active" class="flex-1 space-y-3"></div>
+                <div id="col-active" ondragover="allowDrop(event)" ondrop="drop(event, 'active')"
+                    class="flex-1 space-y-3"></div>
             </div>
 
-            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
+            <!-- Column 2 -->
+            <div
+                class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span><span class="text-xs font-bold text-amber-400 tracking-wide uppercase">Offer Received</span></div>
-                    <span id="badge-offer" class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        <span id="col-title-offer"
+                            class="text-xs font-bold text-amber-400 tracking-wide uppercase">Offer Received</span>
+                    </div>
+                    <span id="badge-offer"
+                        class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
-                <div id="col-offer" class="flex-1 space-y-3"></div>
+                <div id="col-offer" ondragover="allowDrop(event)" ondrop="drop(event, 'offer')"
+                    class="flex-1 space-y-3"></div>
             </div>
 
-            <div class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
+            <!-- Column 3 -->
+            <div
+                class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 flex flex-col min-h-[480px]">
                 <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-400"></span><span class="text-xs font-bold text-purple-400 tracking-wide uppercase">Under Contract</span></div>
-                    <span id="badge-contract" class="bg-purple-500/10 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                        <span id="col-title-contract"
+                            class="text-xs font-bold text-purple-400 tracking-wide uppercase">Under Contract</span>
+                    </div>
+                    <span id="badge-contract"
+                        class="bg-purple-500/10 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
-                <div id="col-contract" class="flex-1 space-y-3"></div>
+                <div id="col-contract" ondragover="allowDrop(event)" ondrop="drop(event, 'contract')"
+                    class="flex-1 space-y-3"></div>
             </div>
 
         </div>
     </main>
 
-    <div id="property-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
-            <h3 class="text-sm font-bold text-slate-100 mb-4">Add Agency Property Listing</h3>
+    <!-- Overlay Modal: Add New Property -->
+    <div id="property-modal"
+        class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+        <div
+            class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
+            <h3 id="modal-add-title" class="text-sm font-bold text-slate-100 mb-4">Add Agency Property Listing</h3>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Property Title/Address</label>
-                    <input id="form-title" type="text" placeholder="e.g., 742 Evergreen Terrace" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                    <label id="form-lbl-title" class="block text-slate-400 font-medium mb-1">Property
+                        Title/Address</label>
+                    <input id="form-title" type="text"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
-                        <input id="form-price" type="number" placeholder="450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                        <label id="form-lbl-price" class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
+                        <input id="form-price" type="number" placeholder="450000"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-slate-400 font-medium mb-1">Property Type</label>
-                        <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
-                            <option value="Single Family">🏡 Single Family</option>
-                            <option value="Modern Condo">🏢 Condo / Apartment</option>
-                            <option value="Luxury Villa">🌴 Luxury Villa</option>
+                        <label id="form-lbl-type" class="block text-slate-400 font-medium mb-1">Property Type</label>
+                        <select id="form-type"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Property Image URL (Optional)</label>
-                    <input id="form-image" type="url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                    <label id="form-lbl-image" class="block text-slate-400 font-medium mb-1">Property Image URL
+                        (Optional)</label>
+                    <input id="form-image" type="url" placeholder="https://images.unsplash.com/..."
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
-                
+
                 <div class="border-t border-slate-800 pt-3 mt-2">
-                    <p class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider mb-2">🤝 Client Details (Optional)</p>
+                    <p id="form-lbl-client-section"
+                        class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider mb-2">🤝 Client Details
+                        (Optional)</p>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Seller Name</label>
-                            <input id="form-seller-name" type="text" placeholder="John Doe" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                            <label id="form-lbl-seller-name" class="block text-slate-400 font-medium mb-1">Seller
+                                Name</label>
+                            <input id="form-seller-name" type="text"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Seller Phone/Email</label>
-                            <input id="form-seller-contact" type="text" placeholder="+1555..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                            <label id="form-lbl-seller-contact" class="block text-slate-400 font-medium mb-1">Seller
+                                Phone/Email</label>
+                            <input id="form-seller-contact" type="text"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mt-2">
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Target Buyer Name</label>
-                            <input id="form-buyer-name" type="text" placeholder="Jane Smith" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                            <label id="form-lbl-buyer-name" class="block text-slate-400 font-medium mb-1">Target Buyer
+                                Name</label>
+                            <input id="form-buyer-name" type="text"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-slate-400 font-medium mb-1">Buyer Max Budget</label>
-                            <input id="form-buyer-budget" type="number" placeholder="500000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                            <label id="form-lbl-buyer-budget" class="block text-slate-400 font-medium mb-1">Buyer Max
+                                Budget</label>
+                            <input id="form-buyer-budget" type="number"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="flex gap-2 justify-end mt-5 text-xs font-bold">
-                <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
-                <button onclick="submitListing()" class="px-4 py-2 bg-emerald-500 text-slate-950 rounded-lg">Save Listing</button>
+                <button onclick="closeModal()" id="form-btn-cancel"
+                    class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Cancel</button>
+                <button onclick="submitListing()" id="form-btn-save"
+                    class="px-4 py-2 bg-emerald-500 text-slate-950 rounded-lg">Save Listing</button>
             </div>
         </div>
     </div>
 
-    <div id="pitch-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-            <h3 class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-1.5">📢 Dynamic CRM Pitch Engine</h3>
-            
-            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 mb-3 text-xs font-bold">
-                <button id="mode-buyer" onclick="setPitchMode('buyer')" class="py-1.5 rounded-md text-cyan-400 bg-slate-900 border border-slate-800">For Potential Buyer</button>
-                <button id="mode-seller" onclick="setPitchMode('seller')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">For Property Seller</button>
+    <!-- Pitch Configurator & Dual Client Sharer Modal -->
+    <div id="pitch-modal"
+        class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+        <div
+            class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+            <h3 id="pitch-title" class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-1.5">📢 Dynamic CRM
+                Pitch Engine</h3>
+
+            <div
+                class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 mb-3 text-xs font-bold">
+                <button id="mode-buyer" onclick="setPitchMode('buyer')" class="py-1.5 rounded-md">For Potential
+                    Buyer</button>
+                <button id="mode-seller" onclick="setPitchMode('seller')" class="py-1.5 rounded-md">For Property
+                    Seller</button>
             </div>
 
             <div class="space-y-3 text-xs flex-1 overflow-y-auto pr-1 no-scrollbar">
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Agent / Agency Signature</label>
-                    <input id="pitch-agent" type="text" oninput="regeneratePitchText()" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
+                    <label id="pitch-lbl-agent" class="block text-slate-400 font-medium mb-1">Agent / Agency
+                        Signature</label>
+                    <input id="pitch-agent" type="text" oninput="regeneratePitchText()"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
 
                 <div class="bg-slate-950/50 border border-slate-800/60 p-2.5 rounded-lg space-y-2">
-                    <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Live Database Connections</p>
+                    <p id="pitch-lbl-live-connections"
+                        class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Live Database Connections
+                    </p>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Seller Info</label>
-                            <input id="pitch-seller-name" type="text" oninput="updateLiveClientData('sellerName')" class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
+                            <label id="pitch-lbl-seller-data" class="block text-[10px] text-slate-500 mb-0.5">Seller
+                                Info</label>
+                            <input id="pitch-seller-name" type="text" oninput="updateLiveClientData('sellerName')"
+                                class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Buyer Info</label>
-                            <input id="pitch-buyer-name" type="text" oninput="updateLiveClientData('buyerName')" class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
+                            <label id="pitch-lbl-buyer-data" class="block text-[10px] text-slate-500 mb-0.5">Buyer
+                                Info</label>
+                            <input id="pitch-buyer-name" type="text" oninput="updateLiveClientData('buyerName')"
+                                class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
                         </div>
                     </div>
                 </div>
 
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-slate-400 font-medium">Property Status Note</label>
-                        <button onclick="saveNoteToDatabase()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] uppercase px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 transition-all">
+                        <label id="pitch-lbl-status-note" class="block text-slate-400 font-medium">Property Status
+                            Note</label>
+                        <button onclick="saveNoteToDatabase()" id="pitch-btn-save-note"
+                            class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] uppercase px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 transition-all">
                             💾 Save to Site
                         </button>
                     </div>
-                    <input id="pitch-note" type="text" oninput="regeneratePitchText()" placeholder="Add pipeline metrics or closing feedback details..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
+                    <input id="pitch-note" type="text" oninput="regeneratePitchText()"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Compiled Layout Message</label>
-                    <textarea id="pitch-textarea" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none leading-relaxed"></textarea>
+                    <label id="pitch-lbl-compiled-msg" class="block text-slate-400 font-medium mb-1">Compiled Layout
+                        Message</label>
+                    <textarea id="pitch-textarea" rows="6"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none leading-relaxed"></textarea>
                 </div>
             </div>
 
             <div class="flex gap-2 justify-end mt-4 text-xs font-bold shrink-0">
-                <button onclick="closePitchModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Close</button>
-                <button onclick="executePitchShare()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 rounded-lg flex items-center gap-1">
+                <button onclick="closePitchModal()" id="pitch-btn-close"
+                    class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Close</button>
+                <button onclick="executePitchShare()" id="pitch-btn-share"
+                    class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 rounded-lg flex items-center gap-1">
                     🚀 Share / Copy
                 </button>
             </div>
         </div>
     </div>
-
+    <!-- Core App Logic Engine -->
     <script>
-        // Dictionary for Complete UI Multilingual Localization
-const translations = {
-    en: {
-        langBtn: "🌐 EN", searchPlaceholder: "🔍 Search by address or client...",
-        allTypes: "All Types", singleFamily: "🏡 Single Family", modernCondo: "🏢 Condo / Apartment", luxuryVilla: "🌴 Luxury Villa",
-        addListingBtn: "➕ Add Listing", activePipeline: "Active Pipeline", estCommission: "Est. Commission (3%)",
-        filteredListings: "Filtered Listings", stageDistribution: "Stage Distribution",
-        colActive: "Active Listings", colOffer: "Offer Received", colContract: "Under Contract",
-        modalAddTitle: "Add Agency Property Listing", formTitle: "Property Title/Address", formPrice: "Price ($ USD)", formType: "Property Type", formImage: "Property Image URL (Optional)",
-        formClientSection: "🤝 Client Details (Optional)", formSellerName: "Seller Name", formSellerContact: "Seller Phone/Email", formBuyerName: "Target Buyer Name", formBuyerBudget: "Buyer Max Budget",
-        btnCancel: "Cancel", btnSave: "Save Listing", pitchTitle: "📢 Dynamic CRM Pitch Engine", modeBuyer: "For Potential Buyer", modeSeller: "For Property Seller",
-        pitchAgent: "Agent / Agency Signature", pitchLiveConns: "Live Database Connections", pitchSellerData: "Seller Info", pitchBuyerData: "Buyer Info",
-        pitchStatusNote: "Property Status Note", pitchSaveNoteBtn: "💾 Save to Site", pitchCompiledMsg: "Compiled Layout Message", pitchClose: "Close", pitchShare: "Share / Copy",
-        cardSeller: "Seller", cardBuyer: "Potential Buyer", cardNone: "None Listed", cardClosed: "✨ Closed", cardRegress: "⬅️ Regress", cardAdvanceOffer: "Advance Offer ➡️", cardSignContract: "Sign Contract ➡️",
-        cardCustomizeBtn: "📢 Customize & Share Pitch", noteSynchronized: "💾 Pipeline notes synchronized!", requiredFields: "Please complete required listing fields.",
-        pitchHotMarket: "🎯 EXCLUSIVE PROPERTY AVAILABILITY:", pitchAddress: "📍 Address:", pitchMarketValue: "💰 Market Value:", pitchCategory: "🏛️ Category:", pitchBrokerInsight: "💡 Broker Insight:", pitchBestRegards: "Best regards,",
-        pitchBriefing: "📋 BRIEFING REPORT // PROPERTY DEAL PIPELINE:", pitchAsset: "📍 Asset:", pitchPipelineStage: "⚡ Current Pipeline Stage:", pitchActiveLead: "👤 Active Lead Registered:", pitchPipelineNote: "💡 Pipeline Note:", pitchContinueUpdates: "We will continue pushing updates. Let me know if you have questions."
-    },
-    tr: {
-        langBtn: "🌐 TR", searchPlaceholder: "🔍 Adres veya müşteri ile ara...",
-        allTypes: "Tüm Türler", singleFamily: "🏡 Müstakil Ev", modernCondo: "🏢 Daire / Rezidans", luxuryVilla: "🌴 Lüks Villa",
-        addListingBtn: "➕ İlan Ekle", activePipeline: "Aktif Portföy", estCommission: "Tahmini Komisyon (3%)",
-        filteredListings: "Filtrelenen İlanlar", stageDistribution: "Aşama Dağılımı",
-        colActive: "Aktif İlanlar", colOffer: "Teklif Alındı", colContract: "Sözleşme Aşaması",
-        modalAddTitle: "Acente Gayrimenkul İlanı Ekle", formTitle: "Mülk Başlığı / Adresi", formPrice: "Fiyat ($ USD)", formType: "Mülk Türü", formImage: "Mülk Görsel URL'si (Opsiyonel)",
-        formClientSection: "🤝 Müşteri Bilgileri (Opsiyonel)", formSellerName: "Satıcı İsmi", formSellerContact: "Satıcı Telefon/E-posta", formBuyerName: "Hedef Alıcı İsmi", formBuyerBudget: "Alıcı Maks. Bütçe",
-        btnCancel: "İptal", btnSave: "İlanı Kaydet", pitchTitle: "📢 Dinamik CRM Sunum Motoru", modeBuyer: "Potansiyel Alıcı İçin", modeSeller: "Mülk Sahibi İçin",
-        pitchAgent: "Danışman / İmza", pitchLiveConns: "Canlı Veritabanı Bağlantıları", pitchSellerData: "Satıcı Bilgisi", pitchBuyerData: "Alıcı Bilgisi",
-        pitchStatusNote: "Mülk Durum Notu", pitchSaveNoteBtn: "💾 Siteye Kaydet", pitchCompiledMsg: "Derlenen Mesaj Metni", pitchClose: "Kapat", pitchShare: "Paylaş / Kopyala",
-        cardSeller: "Satıcı", cardBuyer: "Potansiyel Alıcı", cardNone: "Kayıt Yok", cardClosed: "✨ Kapatıldı", cardRegress: "⬅️ Geri Al", cardAdvanceOffer: "Teklife Taşı ➡️", cardSignContract: "Sözleşme İmzala ➡️",
-        cardCustomizeBtn: "📢 Düzenle & Paylaş", noteSynchronized: "💾 Süreç notları senkronize edildi!", requiredFields: "Lütfen gerekli alanları doldurun.",
-        pitchHotMarket: "🎯 ÖZEL MÜLK FIRSATI:", pitchAddress: "📍 Adres:", pitchMarketValue: "💰 Piyasa Değeri:", pitchCategory: "🏛️ Kategori:", pitchBrokerInsight: "💡 Danışman Görüşü:", pitchBestRegards: "Saygılarımla,",
-        pitchBriefing: "📋 BİLGİLENDİRME RAPORU // MÜLK SÜREÇ TAKİBİ:", pitchAsset: "📍 Mülk:", pitchPipelineStage: "⚡ Güncel Süreç Aşaması:", pitchActiveLead: "👤 Kayıtlı Aktif Alıcı:", pitchPipelineNote: "💡 Süreç Notu:", pitchContinueUpdates: "Gelişmeleri aktarmaya devam edeceğiz. Sorularınız olursa lütfen iletişime geçin."
-    }
-};
+        const translations = {
+            en: {
+                langBtn: "🌐 EN", searchPlaceholder: "🔍 Search by address or client...",
+                allTypes: "All Types", singleFamily: "🏡 Single Family", modernCondo: "🏢 Condo / Apartment", luxuryVilla: "🌴 Luxury Villa",
+                addListingBtn: "➕ Add Listing", activePipeline: "Active Pipeline", estCommission: "Est. Commission (3%)",
+                filteredListings: "Filtered Listings", stageDistribution: "Stage Distribution",
+                colActive: "Active Listings", colOffer: "Offer Received", colContract: "Under Contract",
+                modalAddTitle: "Add Agency Property Listing", formTitle: "Property Title/Address", formPrice: "Price ($ USD)", formType: "Property Type", formImage: "Property Image URL (Optional)",
+                formClientSection: "🤝 Client Details (Optional)", formSellerName: "Seller Name", formSellerContact: "Seller Phone/Email", formBuyerName: "Target Buyer Name", formBuyerBudget: "Buyer Max Budget",
+                btnCancel: "Cancel", btnSave: "Save Listing", pitchTitle: "📢 Dynamic CRM Pitch Engine", modeBuyer: "For Potential Buyer", modeSeller: "For Property Seller",
+                pitchAgent: "Agent / Agency Signature", pitchLiveConns: "Live Database Connections", pitchSellerData: "Seller Info", pitchBuyerData: "Buyer Info",
+                pitchStatusNote: "Property Status Note", pitchSaveNoteBtn: "💾 Save to Site", pitchCompiledMsg: "Compiled Layout Message", pitchClose: "Close", pitchShare: "Share / Copy",
+                cardSeller: "Seller", cardBuyer: "Potential Buyer", cardNone: "None Listed", cardClosed: "✨ Closed", cardRegress: "⬅️ Regress", cardAdvanceOffer: "Advance Offer ➡️", cardSignContract: "Sign Contract ➡️",
+                cardCustomizeBtn: "📢 Customize & Share Pitch", noteSynchronized: "💾 Pipeline notes synchronized!", requiredFields: "Please complete required listing fields.",
+                pitchHotMarket: "🎯 EXCLUSIVE PROPERTY AVAILABILITY:", pitchAddress: "📍 Address:", pitchMarketValue: "💰 Market Value:", pitchCategory: "🏛️ Category:", pitchBrokerInsight: "💡 Broker Insight:", pitchBestRegards: "Best regards,",
+                pitchBriefing: "📋 BRIEFING REPORT // PROPERTY DEAL PIPELINE:", pitchAsset: "📍 Asset:", pitchPipelineStage: "⚡ Current Pipeline Stage:", pitchActiveLead: "👤 Active Lead Registered:", pitchPipelineNote: "💡 Pipeline Note:", pitchContinueUpdates: "We will continue pushing updates. Let me know if you have questions."
+            },
+            tr: {
+                langBtn: "🌐 TR", searchPlaceholder: "🔍 Adres veya müşteri ile ara...",
+                allTypes: "Tüm Türler", singleFamily: "🏡 Müstakil Ev", modernCondo: "🏢 Daire / Rezidans", luxuryVilla: "🌴 Lüks Villa",
+                addListingBtn: "➕ İlan Ekle", activePipeline: "Aktif Portföy", estCommission: "Tahmini Komisyon (3%)",
+                filteredListings: "Filtrelenen İlanlar", stageDistribution: "Aşama Dağılımı",
+                colActive: "Aktif İlanlar", colOffer: "Teklif Alındı", colContract: "Sözleşme Aşaması",
+                modalAddTitle: "Acente Gayrimenkul İlanı Ekle", formTitle: "Mülk Başlığı / Adresi", formPrice: "Fiyat ($ USD)", formType: "Mülk Türü", formImage: "Mülk Görsel URL'si (Opsiyonel)",
+                formClientSection: "🤝 Müşteri Bilgileri (Opsiyonel)", formSellerName: "Satıcı İsmi", formSellerContact: "Satıcı Telefon/E-posta", formBuyerName: "Hedef Alıcı İsmi", formBuyerBudget: "Alıcı Maks. Bütçe",
+                btnCancel: "İptal", btnSave: "İlanı Kaydet", pitchTitle: "📢 Dinamik CRM Sunum Motoru", modeBuyer: "Potansiyel Alıcı İçin", modeSeller: "Mülk Sahibi İçin",
+                pitchAgent: "Danışman / İmza", pitchLiveConns: "Canlı Veritabanı Bağlantıları", pitchSellerData: "Satıcı Bilgisi", pitchBuyerData: "Alıcı Bilgisi",
+                pitchStatusNote: "Mülk Durum Notu", pitchSaveNoteBtn: "💾 Siteye Kaydet", pitchCompiledMsg: "Derlenen Mesaj Metni", pitchClose: "Kapat", pitchShare: "Paylaş / Kopyala",
+                cardSeller: "Satıcı", cardBuyer: "Potansiyel Alıcı", cardNone: "Kayıt Yok", cardClosed: "✨ Kapatıldı", cardRegress: "⬅️ Geri Al", cardAdvanceOffer: "Teklife Taşı ➡️", cardSignContract: "Sözleşme İmzala ➡️",
+                cardCustomizeBtn: "📢 Düzenle & Paylaş", noteSynchronized: "💾 Süreç notları senkronize edildi!", requiredFields: "Lütfen gerekli alanları doldurun.",
+                pitchHotMarket: "🎯 ÖZEL MÜLK FIRSATI:", pitchAddress: "📍 Adres:", pitchMarketValue: "💰 Piyasa Değeri:", pitchCategory: "🏛️ Kategori:", pitchBrokerInsight: "💡 Danışman Görüşü:", pitchBestRegards: "Saygılarımla,",
+                pitchBriefing: "📋 BİLGİLENDİRME RAPORU // MÜLK SÜREÇ TAKİBİ:", pitchAsset: "📍 Mülk:", pitchPipelineStage: "⚡ Güncel Süreç Aşaması:", pitchActiveLead: "👤 Kayıtlı Aktif Alıcı:", pitchPipelineNote: "💡 Süreç Notu:", pitchContinueUpdates: "Gelişmeleri aktarmaya devam edeceğiz. Sorularınız olursa lütfen iletişime geçin."
+            }
+        };
 
-let currentLang = localStorage.getItem('brokerflow_lang') || 'en';
+        let currentLang = localStorage.getItem('brokerflow_lang') || 'en';
 
-const typeImages = {
-    "Single Family": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80",
-    "Modern Condo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80",
-    "Luxury Villa": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=400&q=80"
-};
+        const typeImages = {
+            "Single Family": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80",
+            "Modern Condo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=400&q=80",
+            "Luxury Villa": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=400&q=80"
+        };
 
-const defaultSeed = [
-    { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "", notes: "Skyview panorama layout.", sellerName: "Marcus Vance", sellerContact: "marcus@vance.io", buyerName: "Alice Miller", buyerBudget: 850000 },
-    { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "", notes: "Infinity pool setup.", sellerName: "Elena Rostova", sellerContact: "+1 (555) 019-2831", buyerName: "David Chen", buyerBudget: 2400000 },
-    { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "", notes: "Huge backyard layout.", sellerName: "Tom Geller", sellerContact: "tgeller@gmail.com", buyerName: "The Rodriguez Family", buyerBudget: 550000 }
-];
+        const defaultSeed = [
+            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "", notes: "Skyview panorama layout.", sellerName: "Marcus Vance", sellerContact: "marcus@vance.io", buyerName: "Alice Miller", buyerBudget: 850000 },
+            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "", notes: "Infinity pool setup.", sellerName: "Elena Rostova", sellerContact: "+1 (555) 019-2831", buyerName: "David Chen", buyerBudget: 2400000 },
+            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "", notes: "Huge backyard layout.", sellerName: "Tom Geller", sellerContact: "tgeller@gmail.com", buyerName: "The Rodriguez Family", buyerBudget: 550000 }
+        ];
 
-let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
-let activePitchId = null;
-let activePitchMode = 'buyer';
+        let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
+        let activePitchId = null;
+        let activePitchMode = 'buyer';
 
-function saveToStorage() { localStorage.setItem('brokerflow_listings', JSON.stringify(listings)); }
+        function saveToStorage() { localStorage.setItem('brokerflow_listings', JSON.stringify(listings)); }
 
-function toggleLanguage() {
-    currentLang = currentLang === 'en' ? 'tr' : 'en';
-    localStorage.setItem('brokerflow_lang', currentLang);
-    applyLanguageTranslations();
-    renderDashboard();
-}
-
-function applyLanguageTranslations() {
-    const t = translations[currentLang];
-    
-    document.getElementById('lang-btn').innerText = t.langBtn;
-    document.getElementById('search-bar').placeholder = t.searchPlaceholder;
-    document.getElementById('ui-add-listing-btn').innerText = t.addListingBtn;
-    
-    document.getElementById('lbl-active-pipeline').innerText = t.activePipeline;
-    document.getElementById('lbl-est-commission').innerText = t.estCommission;
-    document.getElementById('lbl-filtered-listings').innerText = t.filteredListings;
-    document.getElementById('lbl-stage-distribution').innerText = t.stageDistribution;
-    
-    document.getElementById('col-title-active').innerText = t.colActive;
-    document.getElementById('col-title-offer').innerText = t.colOffer;
-    document.getElementById('col-title-contract').innerText = t.colContract;
-    
-    document.getElementById('modal-add-title').innerText = t.modalAddTitle;
-    document.getElementById('form-lbl-title').innerText = t.formTitle;
-    document.getElementById('form-lbl-price').innerText = t.formPrice;
-    document.getElementById('form-lbl-type').innerText = t.formType;
-    document.getElementById('form-lbl-image').innerText = t.formImage;
-    document.getElementById('form-lbl-client-section').innerText = t.formClientSection;
-    document.getElementById('form-lbl-seller-name').innerText = t.formSellerName;
-    document.getElementById('form-lbl-seller-contact').innerText = t.formSellerContact;
-    document.getElementById('form-lbl-buyer-name').innerText = t.formBuyerName;
-    document.getElementById('form-lbl-buyer-budget').innerText = t.formBuyerBudget;
-    document.getElementById('form-btn-cancel').innerText = t.btnCancel;
-    document.getElementById('form-btn-save').innerText = t.btnSave;
-
-    document.getElementById('pitch-title').innerText = t.pitchTitle;
-    document.getElementById('mode-buyer').innerText = t.modeBuyer;
-    document.getElementById('mode-seller').innerText = t.modeSeller;
-    document.getElementById('pitch-lbl-agent').innerText = t.pitchAgent;
-    document.getElementById('pitch-lbl-live-connections').innerText = t.pitchLiveConns;
-    document.getElementById('pitch-lbl-seller-data').innerText = t.pitchSellerData;
-    document.getElementById('pitch-lbl-buyer-data').innerText = t.pitchBuyerData;
-    document.getElementById('pitch-lbl-status-note').innerText = t.pitchStatusNote;
-    document.getElementById('pitch-btn-save-note').innerText = t.pitchSaveNoteBtn;
-    document.getElementById('pitch-lbl-compiled-msg').innerText = t.pitchCompiledMsg;
-    document.getElementById('pitch-btn-close').innerText = t.pitchClose;
-    document.getElementById('pitch-btn-share').innerText = t.pitchShare;
-
-    const filterSelect = document.getElementById('filter-type');
-    const savedFilterVal = filterSelect.value || "All";
-    filterSelect.innerHTML = `
-        <option value="All">${t.allTypes}</option>
-        <option value="Single Family">${t.singleFamily}</option>
-        <option value="Modern Condo">${t.modernCondo}</option>
-        <option value="Luxury Villa">${t.luxuryVilla}</option>
-    `;
-    filterSelect.value = savedFilterVal;
-
-    const formTypeSelect = document.getElementById('form-type');
-    formTypeSelect.innerHTML = `
-        <option value="Single Family">${t.singleFamily}</option>
-        <option value="Modern Condo">${t.modernCondo}</option>
-        <option value="Luxury Villa">${t.luxuryVilla}</option>
-    `;
-}
-
-function openPitchModal(id) {
-    const property = listings.find(p => p.id === id);
-    if (!property) return;
-
-    activePitchId = id;
-    activePitchMode = 'buyer';
-    
-    document.getElementById('pitch-note').value = property.notes || '';
-    document.getElementById('pitch-agent').value = localStorage.getItem('brokerflow_agent_name') || '';
-    document.getElementById('pitch-seller-name').value = property.sellerName || '';
-    document.getElementById('pitch-buyer-name').value = property.buyerName || '';
-    
-    setPitchMode('buyer');
-    document.getElementById('pitch-modal').classList.remove('hidden');
-}
-
-function closePitchModal() { document.getElementById('pitch-modal').classList.add('hidden'); }
-
-function setPitchMode(mode) {
-    activePitchMode = mode;
-    const bBtn = document.getElementById('mode-buyer');
-    const sBtn = document.getElementById('mode-seller');
-
-    if(mode === 'buyer') {
-        bBtn.className = "py-1.5 rounded-md text-cyan-400 bg-slate-900 border border-slate-800 w-full text-center";
-        sBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200 w-full text-center";
-    } else {
-        sBtn.className = "py-1.5 rounded-md text-emerald-400 bg-slate-900 border border-slate-800 w-full text-center";
-        bBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200 w-full text-center";
-    }
-    regeneratePitchText();
-}
-
-function updateLiveClientData(field) {
-    if (!activePitchId) return;
-    const value = document.getElementById(`pitch-${field.replace(/([A-Z])/g, '-$1').toLowerCase()}`).value.trim();
-    const index = listings.findIndex(p => p.id === activePitchId);
-    if(index !== -1) {
-        listings[index][field] = value;
-        saveToStorage();
-    }
-    regeneratePitchText();
-}
-
-function saveNoteToDatabase() {
-    if (!activePitchId) return;
-    const targetNote = document.getElementById('pitch-note').value.trim();
-    const index = listings.findIndex(p => p.id === activePitchId);
-    if (index !== -1) {
-        listings[index].notes = targetNote;
-        saveToStorage();
-        renderDashboard();
-        alert(translations[currentLang].noteSynchronized);
-    }
-}
-
-function regeneratePitchText() {
-    if (!activePitchId) return;
-    const property = listings.find(p => p.id === activePitchId);
-    if (!property) return;
-
-    const t = translations[currentLang];
-    const agentName = document.getElementById('pitch-agent').value.trim() || "Agent Desk";
-    const clientNote = document.getElementById('pitch-note').value.trim();
-    
-    if(agentName !== "Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
-
-    let msg = "";
-    if (activePitchMode === 'buyer') {
-        msg += property.buyerName ? `Hi ${property.buyerName},\n\n` : "Hello,\n\n";
-        msg += `${t.pitchHotMarket}\n`;
-        msg += `${t.pitchAddress} ${property.title}\n`;
-        msg += `${t.pitchMarketValue} $${property.price.toLocaleString()} USD\n`;
-        msg += `${t.pitchCategory} ${t[property.type.replace(/ /g, '').replace('/', '').toLowerCase().replace('condoapartment', 'moderncondo')] || property.type}\n`;
-        if(clientNote) msg += `\n${t.pitchBrokerInsight} "${clientNote}"\n`;
-        msg += `\n${t.pitchBestRegards}\n${agentName}`;
-    } else {
-        msg += property.sellerName ? `Hi ${property.sellerName},\n\n` : "Hello,\n\n";
-        msg += `${t.pitchBriefing}\n`;
-        msg += `${t.pitchAsset} ${property.title}\n`;
-        msg += `${t.pitchPipelineStage} ${property.stage.toUpperCase()}\n`;
-        if(property.buyerName) msg += `${t.pitchActiveLead} ${property.buyerName}\n`;
-        if(clientNote) msg += `\n${t.pitchPipelineNote} "${clientNote}"\n`;
-        msg += `\n${t.pitchContinueUpdates}\n\n${t.pitchBestRegards}\n${agentName}`;
-    }
-    document.getElementById('pitch-textarea').value = msg;
-}
-
-function executePitchShare() {
-    const finalText = document.getElementById('pitch-textarea').value;
-    if (navigator.share) {
-        navigator.share({ title: 'BrokerFlow Data Summary', text: finalText });
-    } else {
-        navigator.clipboard.writeText(finalText).then(() => { alert("📋 Done!"); });
-    }
-}
-
-function renderDashboard() {
-    const t = translations[currentLang];
-    document.getElementById('col-active').innerHTML = '';
-    document.getElementById('col-offer').innerHTML = '';
-    document.getElementById('col-contract').innerHTML = '';
-
-    const sK = document.getElementById('search-bar').value.toLowerCase();
-    const filterType = document.getElementById('filter-type').value;
-
-    let totalValue = 0;
-    let counts = { active: 0, offer: 0, contract: 0 };
-    let visibleCount = 0;
-
-    listings.forEach(item => {
-        const matchTitle = item.title.toLowerCase().includes(sK);
-        const matchSeller = (item.sellerName || "").toLowerCase().includes(sK);
-        const matchBuyer = (item.buyerName || "").toLowerCase().includes(sK);
-        const matchesSearch = matchTitle || matchSeller || matchBuyer;
-        
-        const matchesType = (filterType === 'All' || item.type === filterType);
-
-        if (matchesSearch && matchesType) {
-            visibleCount++;
-            totalValue += item.price;
-            counts[item.stage]++;
-
-            const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
-            
-            const displayType = t[item.type.replace(/ /g, '').replace('/', '').toLowerCase().replace('condoapartment', 'moderncondo')] || item.type;
-
-            const cardHTML = `
-                <div class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col">
-                    <div class="w-full h-24 relative bg-slate-800">
-                        <img src="${finalImg}" alt="Cover" class="w-full h-full object-cover">
-                        <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300">${displayType}</span>
-                        <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px]">🗑️</button>
-                    </div>
-                    <div class="p-3 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
-                            <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
-                            
-                            <div class="mt-2 pt-2 border-t border-slate-900 grid grid-cols-2 gap-1.5 text-[10px] bg-slate-900/30 p-1.5 rounded">
-                                <div>
-                                    <span class="text-slate-500 font-bold block text-[8px] uppercase">${t.cardSeller}</span>
-                                    <span class="text-slate-300 font-medium line-clamp-1">${item.sellerName || t.cardNone}</span>
-                                </div>
-                                <div>
-                                    <span class="text-slate-500 font-bold block text-[8px] uppercase">${t.cardBuyer}</span>
-                                    <span class="text-slate-300 font-medium line-clamp-1">${item.buyerName || t.cardNone}</span>
-                                </div>
-                            </div>
-
-                            ${item.notes ? `<p class="text-[9px] text-slate-400 italic mt-2 line-clamp-1 bg-slate-900/60 p-1 rounded">📝 ${item.notes}</p>` : ''}
-                        </div>
-                        <div class="mt-3 space-y-1.5">
-                            <button onclick="openPitchModal(${item.id})" class="w-full text-center bg-slate-900 border border-slate-800 p-1.5 text-[10px] rounded font-semibold text-cyan-400">
-                                ${t.cardCustomizeBtn}
-                            </button>
-                            <div class="pt-1.5 flex justify-between gap-1 text-[9px] font-bold">
-                                ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">${t.cardRegress}</button>` : '<div class="w-1"></div>'}
-                                ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">${t.cardAdvanceOffer}</button>` : ''}
-                                ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">${t.cardSignContract}</button>` : ''}
-                                ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1">${t.cardClosed}</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById(`col-${item.stage}`).innerHTML += cardHTML;
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'tr' : 'en';
+            localStorage.setItem('brokerflow_lang', currentLang);
+            applyLanguageTranslations();
+            renderDashboard();
         }
-    });
 
-    const totalVisible = visibleCount || 1; 
-    const activePct = (counts.active / totalVisible) * 100;
-    const offerPct = (counts.offer / totalVisible) * 100;
-    const contractPct = (counts.contract / totalVisible) * 100;
+        function applyLanguageTranslations() {
+            const t = translations[currentLang];
+            document.getElementById('lang-btn').innerText = t.langBtn;
+            document.getElementById('search-bar').placeholder = t.searchPlaceholder;
+            document.getElementById('ui-add-listing-btn').innerText = t.addListingBtn;
+            document.getElementById('lbl-active-pipeline').innerText = t.activePipeline;
+            document.getElementById('lbl-est-commission').innerText = t.estCommission;
+            document.getElementById('lbl-filtered-listings').innerText = t.filteredListings;
+            document.getElementById('lbl-stage-distribution').innerText = t.stageDistribution;
+            document.getElementById('col-title-active').innerText = t.colActive;
+            document.getElementById('col-title-offer').innerText = t.colOffer;
+            document.getElementById('col-title-contract').innerText = t.colContract;
+            document.getElementById('modal-add-title').innerText = t.modalAddTitle;
+            document.getElementById('form-lbl-title').innerText = t.formTitle;
+            document.getElementById('form-lbl-price').innerText = t.formPrice;
+            document.getElementById('form-lbl-type').innerText = t.formType;
+            document.getElementById('form-lbl-image').innerText = t.formImage;
+            document.getElementById('form-lbl-client-section').innerText = t.formClientSection;
+            document.getElementById('form-lbl-seller-name').innerText = t.formSellerName;
+            document.getElementById('form-lbl-seller-contact').innerText = t.formSellerContact;
+            document.getElementById('form-lbl-buyer-name').innerText = t.formBuyerName;
+            document.getElementById('form-lbl-buyer-budget').innerText = t.formBuyerBudget;
+            document.getElementById('form-btn-cancel').innerText = t.btnCancel;
+            document.getElementById('form-btn-save').innerText = t.btnSave;
+            document.getElementById('pitch-title').innerText = t.pitchTitle;
+            document.getElementById('mode-buyer').innerText = t.modeBuyer;
+            document.getElementById('mode-seller').innerText = t.modeSeller;
+            document.getElementById('pitch-lbl-agent').innerText = t.pitchAgent;
+            document.getElementById('pitch-lbl-live-connections').innerText = t.pitchLiveConns;
+            document.getElementById('pitch-lbl-seller-data').innerText = t.pitchSellerData;
+            document.getElementById('pitch-lbl-buyer-data').innerText = t.pitchBuyerData;
+            document.getElementById('pitch-lbl-status-note').innerText = t.pitchStatusNote;
+            document.getElementById('pitch-btn-save-note').innerText = t.pitchSaveNoteBtn;
+            document.getElementById('pitch-lbl-compiled-msg').innerText = t.pitchCompiledMsg;
+            document.getElementById('pitch-btn-close').innerText = t.pitchClose;
+            document.getElementById('pitch-btn-share').innerText = t.pitchShare;
 
-    document.getElementById('distribution-bar').innerHTML = `
-        <div style="width: ${activePct}%" class="bg-cyan-400 transition-all duration-300"></div>
-        <div style="width: ${offerPct}%" class="bg-amber-400 transition-all duration-300"></div>
-        <div style="width: ${contractPct}%" class="bg-purple-400 transition-all duration-300"></div>
-    `;
+            const filterSelect = document.getElementById('filter-type');
+            const savedFilterVal = filterSelect.value || "All";
+            filterSelect.innerHTML = `
+                <option value="All">${t.allTypes}</option>
+                <option value="Single Family">${t.singleFamily}</option>
+                <option value="Modern Condo">${t.modernCondo}</option>
+                <option value="Luxury Villa">${t.luxuryVilla}</option>
+            `;
+            filterSelect.value = savedFilterVal;
 
-    document.getElementById('metric-total-value').innerText = `$${(totalValue / 1000000).toFixed(2)}M`;
-    document.getElementById('metric-commission').innerText = `$${Math.round((totalValue * 0.03) / 1000).toLocaleString()}K`;
-    document.getElementById('metric-count').innerText = `${visibleCount} ${currentLang === 'en'?'of':'/'} ${listings.length}`;
-    
-    document.getElementById('badge-active').innerText = counts.active;
-    document.getElementById('badge-offer').innerText = counts.offer;
-    document.getElementById('badge-contract').innerText = counts.contract;
-}
+            const formTypeSelect = document.getElementById('form-type');
+            formTypeSelect.innerHTML = `
+                <option value="Single Family">${t.singleFamily}</option>
+                <option value="Modern Condo">${t.modernCondo}</option>
+                <option value="Luxury Villa">${t.luxuryVilla}</option>
+            `;
+        }
 
-function updateStage(id, newStage) {
-    const index = listings.findIndex(p => p.id === id);
-    if (index !== -1) { listings[index].stage = newStage; saveToStorage(); renderDashboard(); }
-}
+        function openPitchModal(id) {
+            const property = listings.find(p => p.id === id);
+            if (!property) return;
+            activePitchId = id;
+            activePitchMode = 'buyer';
+            document.getElementById('pitch-note').value = property.notes || '';
+            document.getElementById('pitch-agent').value = localStorage.getItem('brokerflow_agent_name') || '';
+            document.getElementById('pitch-seller-name').value = property.sellerName || '';
+            document.getElementById('pitch-buyer-name').value = property.buyerName || '';
+            setPitchMode('buyer');
+            document.getElementById('pitch-modal').classList.remove('hidden');
+        }
 
-function deleteListing(id) {
-    listings = listings.filter(p => p.id !== id); saveToStorage(); renderDashboard();
-}
+        function closePitchModal() { document.getElementById('pitch-modal').classList.add('hidden'); }
 
-function submitListing() {
-    const t = translations[currentLang];
-    const title = document.getElementById('form-title').value;
-    const price = parseInt(document.getElementById('form-price').value);
-    const type = document.getElementById('form-type').value;
-    const img = document.getElementById('form-image').value;
-    
-    const sellerName = document.getElementById('form-seller-name').value.trim();
-    const sellerContact = document.getElementById('form-seller-contact').value.trim();
-    const buyerName = document.getElementById('form-buyer-name').value.trim();
-    const buyerBudget = parseInt(document.getElementById('form-buyer-budget').value) || "";
+        function setPitchMode(mode) {
+            activePitchMode = mode;
+            const bBtn = document.getElementById('mode-buyer');
+            const sBtn = document.getElementById('mode-seller');
+            if (mode === 'buyer') {
+                bBtn.className = "py-1.5 rounded-md text-cyan-400 bg-slate-900 border border-slate-800 w-full text-center";
+                sBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200 w-full text-center";
+            } else {
+                sBtn.className = "py-1.5 rounded-md text-emerald-400 bg-slate-900 border border-slate-800 w-full text-center";
+                bBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200 w-full text-center";
+            }
+            regeneratePitchText();
+        }
 
-    if (!title || isNaN(price)) { alert(t.requiredFields); return; }
+        function updateLiveClientData(field) {
+            if (!activePitchId) return;
+            const value = document.getElementById(`pitch-${field.replace(/([A-Z])/g, '-$1').toLowerCase()}`).value.trim();
+            const index = listings.findIndex(p => p.id === activePitchId);
+            if (index !== -1) { listings[index][field] = value; saveToStorage(); }
+            regeneratePitchText();
+        }
 
-    listings.push({ id: Date.now(), title, price, type, img, stage: 'active', notes: "", sellerName, sellerContact, buyerName, buyerBudget });
-    saveToStorage(); closeModal(); renderDashboard();
+        function saveNoteToDatabase() {
+            if (!activePitchId) return;
+            const targetNote = document.getElementById('pitch-note').value.trim();
+            const index = listings.findIndex(p => p.id === activePitchId);
+            if (index !== -1) {
+                listings[index].notes = targetNote;
+                saveToStorage();
+                renderDashboard();
+                alert(translations[currentLang].noteSynchronized);
+            }
+        }
 
-    document.getElementById('form-title').value = ''; document.getElementById('form-price').value = ''; document.getElementById('form-image').value = '';
-    document.getElementById('form-seller-name').value = ''; document.getElementById('form-seller-contact').value = '';
-    document.getElementById('form-buyer-name').value = ''; document.getElementById('form-buyer-budget').value = '';
-}
+        function regeneratePitchText() {
+            if (!activePitchId) return;
+            const property = listings.find(p => p.id === activePitchId);
+            if (!property) return;
+            const t = translations[currentLang];
+            const agentName = document.getElementById('pitch-agent').value.trim() || "Agent Desk";
+            const clientNote = document.getElementById('pitch-note').value.trim();
+            if (agentName !== "Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
 
-function openModal() { document.getElementById('property-modal').classList.remove('hidden'); }
-function closeModal() { document.getElementById('property-modal').classList.add('hidden'); }
+            let msg = "";
+            if (activePitchMode === 'buyer') {
+                msg += property.buyerName ? `Hi ${property.buyerName},\n\n` : "Hello,\n\n";
+                msg += `${t.pitchHotMarket}\n`;
+                msg += `${t.pitchAddress} ${property.title}\n`;
+                msg += `${t.pitchMarketValue} $${property.price.toLocaleString()} USD\n`;
+                msg += `${t.pitchCategory} ${t[property.type.replace(/ /g, '').replace('/', '').toLowerCase().replace('condoapartment', 'moderncondo')] || property.type}\n`;
+                if (clientNote) msg += `\n${t.pitchBrokerInsight} "${clientNote}"\n`;
+                msg += `\n${t.pitchBestRegards}\n${agentName}`;
+            } else {
+                msg += property.sellerName ? `Hi ${property.sellerName},\n\n` : "Hello,\n\n";
+                msg += `${t.pitchBriefing}\n`;
+                msg += `${t.pitchAsset} ${property.title}\n`;
+                msg += `${t.pitchPipelineStage} ${property.stage.toUpperCase()}\n`;
+                if (property.buyerName) msg += `${t.pitchActiveLead} ${property.buyerName}\n`;
+                if (clientNote) msg += `\n${t.pitchPipelineNote} "${clientNote}"\n`;
+                msg += `\n${t.pitchContinueUpdates}\n\n${t.pitchBestRegards}\n${agentName}`;
+            }
+            document.getElementById('pitch-textarea').value = msg;
+        }
 
-applyLanguageTranslations();
-renderDashboard();
+        function executePitchShare() {
+            const finalText = document.getElementById('pitch-textarea').value;
+            if (navigator.share) { navigator.share({ title: 'BrokerFlow Data Summary', text: finalText }); }
+            else { navigator.clipboard.writeText(finalText).then(() => { alert("📋 Done!"); }); }
+        }
 
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev, id) { ev.dataTransfer.setData("text/plain", id); }
+        function drop(ev, newStage) {
+            ev.preventDefault();
+            const id = parseInt(ev.dataTransfer.getData("text/plain"));
+            if (!isNaN(id)) { updateStage(id, newStage); }
+        }
+
+        function renderDashboard() {
+            const t = translations[currentLang];
+            document.getElementById('col-active').innerHTML = '';
+            document.getElementById('col-offer').innerHTML = '';
+            document.getElementById('col-contract').innerHTML = '';
+            const sK = document.getElementById('search-bar').value.toLowerCase();
+            const filterType = document.getElementById('filter-type').value;
+
+            let totalValue = 0, counts = { active: 0, offer: 0, contract: 0 }, visibleCount = 0;
+
+            listings.forEach(item => {
+                const matchTitle = item.title.toLowerCase().includes(sK);
+                const matchSeller = (item.sellerName || "").toLowerCase().includes(sK);
+                const matchBuyer = (item.buyerName || "").toLowerCase().includes(sK);
+                if ((matchTitle || matchSeller || matchBuyer) && (filterType === 'All' || item.type === filterType)) {
+                    visibleCount++;
+                    totalValue += item.price;
+                    counts[item.stage]++;
+                    const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
+                    const displayType = t[item.type.replace(/ /g, '').replace('/', '').toLowerCase().replace('condoapartment', 'moderncondo')] || item.type;
+
+                    const cardHTML = `
+                        <div draggable="true" ondragstart="drag(event, ${item.id})" class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col cursor-grab active:cursor-grabbing">
+                            <div class="w-full h-24 relative bg-slate-800">
+                                <img src="${finalImg}" alt="Cover" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300">${displayType}</span>
+                                <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px]">🗑️</button>
+                            </div>
+                            <div class="p-3 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
+                                    <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
+                                    <div class="mt-2 pt-2 border-t border-slate-900 grid grid-cols-2 gap-1.5 text-[10px] bg-slate-900/30 p-1.5 rounded">
+                                        <div>
+                                            <span class="text-slate-500 font-bold block text-[8px] uppercase">${t.cardSeller}</span>
+                                            <span class="text-slate-300 font-medium line-clamp-1">${item.sellerName || t.cardNone}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500 font-bold block text-[8px] uppercase">${t.cardBuyer}</span>
+                                            <span class="text-slate-300 font-medium line-clamp-1">${item.buyerName || t.cardNone}</span>
+                                        </div>
+                                    </div>
+                                    ${item.notes ? `<p class="text-[9px] text-slate-400 italic mt-2 line-clamp-1 bg-slate-900/60 p-1 rounded">📝 ${item.notes}</p>` : ''}
+                                </div>
+                                <div class="mt-3 space-y-1.5">
+                                    <button onclick="openPitchModal(${item.id})" class="w-full text-center bg-slate-900 border border-slate-800 p-1.5 text-[10px] rounded font-semibold text-cyan-400">
+                                        ${t.cardCustomizeBtn}
+                                    </button>
+                                    <div class="pt-1.5 flex justify-between gap-1 text-[9px] font-bold">
+                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">${t.cardRegress}</button>` : '<div class="w-1"></div>'}
+                                        ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">${t.cardAdvanceOffer}</button>` : ''}
+                                        ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">${t.cardSignContract}</button>` : ''}
+                                        ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1">${t.cardClosed}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById(`col-${item.stage}`).innerHTML += cardHTML;
+                }
+            });
+
+            const totalVisible = visibleCount || 1;
+            document.getElementById('distribution-bar').innerHTML = `
+                <div style="width: ${(counts.active / totalVisible) * 100}%" class="bg-cyan-400 transition-all duration-300"></div>
+                <div style="width: ${(counts.offer / totalVisible) * 100}%" class="bg-amber-400 transition-all duration-300"></div>
+                <div style="width: ${(counts.contract / totalVisible) * 100}%" class="bg-purple-400 transition-all duration-300"></div>
+            `;
+            document.getElementById('metric-total-value').innerText = `$${(totalValue / 1000000).toFixed(2)}M`;
+            document.getElementById('metric-commission').innerText = `$${Math.round((totalValue * 0.03) / 1000).toLocaleString()}K`;
+            document.getElementById('metric-count').innerText = `${visibleCount} ${currentLang === 'en' ? 'of' : '/'} ${listings.length}`;
+            document.getElementById('badge-active').innerText = counts.active;
+            document.getElementById('badge-offer').innerText = counts.offer;
+            document.getElementById('badge-contract').innerText = counts.contract;
+        }
+
+        function updateStage(id, newStage) {
+            const index = listings.findIndex(p => p.id === id);
+            if (index !== -1) { listings[index].stage = newStage; saveToStorage(); renderDashboard(); }
+        }
+
+        function deleteListing(id) { listings = listings.filter(p => p.id !== id); saveToStorage(); renderDashboard(); }
+
+        function submitListing() {
+            const t = translations[currentLang];
+            const title = document.getElementById('form-title').value;
+            const price = parseInt(document.getElementById('form-price').value);
+            const type = document.getElementById('form-type').value;
+            const img = document.getElementById('form-image').value;
+            const sellerName = document.getElementById('form-seller-name').value.trim();
+            const sellerContact = document.getElementById('form-seller-contact').value.trim();
+            const buyerName = document.getElementById('form-buyer-name').value.trim();
+            const buyerBudget = parseInt(document.getElementById('form-buyer-budget').value) || "";
+
+            if (!title || isNaN(price)) { alert(t.requiredFields); return; }
+            listings.push({ id: Date.now(), title, price, type, img, stage: 'active', notes: "", sellerName, sellerContact, buyerName, buyerBudget });
+            saveToStorage(); closeModal(); renderDashboard();
+
+            document.getElementById('form-title').value = ''; document.getElementById('form-price').value = ''; document.getElementById('form-image').value = '';
+            document.getElementById('form-seller-name').value = ''; document.getElementById('form-seller-contact').value = '';
+            document.getElementById('form-buyer-name').value = ''; document.getElementById('form-buyer-budget').value = '';
+        }
+
+        function openModal() { document.getElementById('property-modal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('property-modal').classList.add('hidden'); }
+
+        applyLanguageTranslations();
+        renderDashboard();
     </script>
 </body>
+
 </html>
