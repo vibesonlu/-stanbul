@@ -459,14 +459,14 @@
             }
         }
 
-                function regeneratePitchText() {
+        function regeneratePitchText() {
             if (!activePitchId) return;
             const property = listings.find(p => p.id === activePitchId);
             if (!property) return;
             const t = translations[currentLang];
             const agentName = document.getElementById('pitch-agent').value.trim() || "Agent Desk";
             const clientNote = document.getElementById('pitch-note').value.trim();
-            if(agentName !== "Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
+            if (agentName !== "Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
 
             let msg = "";
             if (activePitchMode === 'buyer') {
@@ -476,12 +476,12 @@
                 } else {
                     msg += property.buyerName ? `Hi ${property.buyerName},\n\n` : "Hello,\n\n";
                 }
-                
+
                 msg += `${t.pitchHotMarket}\n`;
                 msg += `${t.pitchAddress} ${property.title}\n`;
                 msg += `${t.pitchMarketValue} $${property.price.toLocaleString()} USD\n`;
                 msg += `${t.pitchCategory} ${t[property.type.replace(/ /g, '').replace('/', '').toLowerCase().replace('condoapartment', 'moderncondo')] || property.type}\n`;
-                if(clientNote) msg += `\n${t.pitchBrokerInsight} "${clientNote}"\n`;
+                if (clientNote) msg += `\n${t.pitchBrokerInsight} "${clientNote}"\n`;
                 msg += `\n${t.pitchBestRegards}\n${agentName}`;
             } else {
                 // Dynamic language-aware greeting for Sellers
@@ -490,12 +490,12 @@
                 } else {
                     msg += property.sellerName ? `Hi ${property.sellerName},\n\n` : "Hello,\n\n";
                 }
-                
+
                 msg += `${t.pitchBriefing}\n`;
                 msg += `${t.pitchAsset} ${property.title}\n`;
                 msg += `${t.pitchPipelineStage} ${property.stage.toUpperCase()}\n`;
-                if(property.buyerName) msg += `${t.pitchActiveLead} ${property.buyerName}\n`;
-                if(clientNote) msg += `\n${t.pitchPipelineNote} "${clientNote}"\n`;
+                if (property.buyerName) msg += `${t.pitchActiveLead} ${property.buyerName}\n`;
+                if (clientNote) msg += `\n${t.pitchPipelineNote} "${clientNote}"\n`;
                 msg += `\n${t.pitchContinueUpdates}\n\n${t.pitchBestRegards}\n${agentName}`;
             }
             document.getElementById('pitch-textarea').value = msg;
