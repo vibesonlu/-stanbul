@@ -126,7 +126,12 @@
                     <input id="pitch-agent" type="text" oninput="regeneratePitchText()" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Add Custom Client Note</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-slate-400 font-medium">Property Client Note</label>
+                        <button onclick="saveNoteToDatabase()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] tracking-wide uppercase px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 active:scale-95 transition-all">
+                            💾 Save Note to Site
+                        </button>
+                    </div>
                     <input id="pitch-note" type="text" oninput="regeneratePitchText()" placeholder="e.g., Highly motivated seller, quiet neighborhood..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
                 <div>
@@ -152,21 +157,25 @@
         };
 
         const defaultSeed = [
-            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "" },
-            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "" },
-            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "" }
+            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "", notes: "Located in the heart of the business district, skyview panorama." },
+            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "", notes: "Infinity pool setup, fully custom marble textures." },
+            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "", notes: "Huge backyard layout, brand new insulation roof fitted." }
         ];
 
         let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
-        let activePitchData = null; // Holds temporary property contextual data for live generator adjustments
+        let activePitchId = null; // Tracks target property ID explicitly instead of just copy context strings
 
         function saveToStorage() { localStorage.setItem('brokerflow_listings', JSON.stringify(listings)); }
 
-        // NEW: Open Pitch Customizer Overlay Panel Configuration
-        function openPitchModal(title, price, type) {
-            activePitchData = { title, price, type };
-            document.getElementById('pitch-note').value = '';
-            // Fetch cached agent profile name if available, default to "Agent Desk"
+        // Open Pitch Panel & pull saved notes directly from object state memory
+        function openPitchModal(id) {
+            const property = listings.find(p => p.id === id);
+            if (!property) return;
+
+            activePitchId = id;
+            
+            // Inject saved notes into the input if they exist
+            document.getElementById('pitch-note').value = property.notes || '';
             document.getElementById('pitch-agent').value = localStorage.getItem('brokerflow_agent_name') || '';
             
             regeneratePitchText();
@@ -175,19 +184,34 @@
 
         function closePitchModal() { document.getElementById('pitch-modal').classList.add('hidden'); }
 
-        // NEW: Real-Time State Re-calculator for Pitch Form Template
+        // NEW MUTATOR: Save custom input descriptions down to database array strings
+        function saveNoteToDatabase() {
+            if (!activePitchId) return;
+            const targetNote = document.getElementById('pitch-note').value.trim();
+            
+            const index = listings.findIndex(p => p.id === activePitchId);
+            if (index !== -1) {
+                listings[index].notes = targetNote;
+                saveToStorage();
+                renderDashboard(); // Re-render dashboard to update notes shown under the property cards
+                alert("💾 Note successfully saved to this listing in database storage!");
+            }
+        }
+
         function regeneratePitchText() {
-            if (!activePitchData) return;
+            if (!activePitchId) return;
+            const property = listings.find(p => p.id === activePitchId);
+            if (!property) return;
+
             const agentName = document.getElementById('pitch-agent').value.trim() || "Our Agent Desk";
             const clientNote = document.getElementById('pitch-note').value.trim();
             
-            // Cache agent name for later use
             if(agentName !== "Our Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
 
             let message = `🎯 HOT MARKET LISTING!\n\n`;
-            message += `✨ Type: ${activePitchData.type}\n`;
-            message += `📍 Location: ${activePitchData.title}\n`;
-            message += `💰 Asking Price: $${activePitchData.price.toLocaleString()} USD\n`;
+            message += `✨ Type: ${property.type}\n`;
+            message += `📍 Location: ${property.title}\n`;
+            message += `💰 Asking Price: $${property.price.toLocaleString()} USD\n`;
             
             if (clientNote) {
                 message += `\n💡 Broker Note: "${clientNote}"\n`;
@@ -199,19 +223,12 @@
             document.getElementById('pitch-textarea').value = message;
         }
 
-        // NEW: Mobile-Native System Share / Smart Clipboard fallback routine
         function executePitchShare() {
             const finalText = document.getElementById('pitch-textarea').value;
-
             if (navigator.share) {
-                navigator.share({
-                    title: 'Property Pitch Information',
-                    text: finalText
-                }).catch(err => console.log("Share skipped or canceled"));
+                navigator.share({ title: 'Property Pitch Information', text: finalText });
             } else {
-                navigator.clipboard.writeText(finalText).then(() => {
-                    alert("📋 Copied custom pitch securely to device clipboard!");
-                });
+                navigator.clipboard.writeText(finalText).then(() => { alert("📋 Pitch copied to clipboard!"); });
             }
         }
 
@@ -238,9 +255,6 @@
 
                     const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
 
-                    // Escaping single quotes correctly for dynamic function inputs
-                    const safeTitle = item.title.replace(/'/g, "\\'");
-
                     const cardHTML = `
                         <div class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col">
                             <div class="w-full h-28 relative bg-slate-800">
@@ -252,13 +266,15 @@
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
                                     <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
+                                    
+                                    ${item.notes ? `<p class="text-[10px] text-slate-400 italic mt-2 line-clamp-2 bg-slate-900/50 p-1.5 rounded border border-slate-800/40">📝 ${item.notes}</p>` : ''}
                                 </div>
                                 <div class="mt-3 space-y-2">
-                                    <button onclick="openPitchModal('${safeTitle}', ${item.price}, '${item.type}')" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-cyan-400 flex items-center justify-center gap-1">
+                                    <button onclick="openPitchModal(${item.id})" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-cyan-400 flex items-center justify-center gap-1">
                                         📢 Customize Client Pitch
                                     </button>
                                     <div class="pt-2 border-t border-slate-900 flex justify-between gap-1 text-[9px] font-bold">
-                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅️ Regress</button>` : '<div class="w-1"></div>'}
+                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅ Late</button>` : '<div class="w-1"></div>'}
                                         ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
                                         ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">Sign Contract ➡️</button>` : ''}
                                         ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1 flex items-center gap-0.5">✨ Closing</span>` : ''}
@@ -317,7 +333,8 @@
                 return;
             }
 
-            listings.push({ id: Date.now(), title, price, type, img, stage: 'active' });
+            // New entries instantiate with blank notes fields
+            listings.push({ id: Date.now(), title, price, type, img, stage: 'active', notes: "" });
             saveToStorage();
             closeModal();
             renderDashboard();
