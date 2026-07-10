@@ -25,8 +25,8 @@
 
     <section class="px-4 pt-4">
         <div class="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 flex flex-col sm:flex-row gap-2">
-            <input id="search-bar" type="text" oninput="renderDashboard()" placeholder="🔍 Search by address..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
-            <select id="filter-type" onchange="renderDashboard()" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+            <input id="search-bar" type="text" oninput="renderDashboard()" placeholder="🔍 Search by address or client..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
+            <select id="filter-type" onchange="renderDashboard()" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none">
                 <option value="All">All Types</option>
                 <option value="Single Family">🏡 Single Family</option>
                 <option value="Modern Condo">🏢 Condo / Apartment</option>
@@ -85,28 +85,54 @@
     </main>
 
     <div id="property-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
             <h3 class="text-sm font-bold text-slate-100 mb-4">Add Agency Property Listing</h3>
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Title/Address</label>
                     <input id="form-title" type="text" placeholder="e.g., 742 Evergreen Terrace" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
-                    <input id="form-price" type="number" placeholder="e.g., 450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 font-medium mb-1">Price ($ USD)</label>
+                        <input id="form-price" type="number" placeholder="450000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-medium mb-1">Property Type</label>
+                        <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
+                            <option value="Single Family">🏡 Single Family</option>
+                            <option value="Modern Condo">🏢 Condo / Apartment</option>
+                            <option value="Luxury Villa">🌴 Luxury Villa</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-slate-400 font-medium mb-1">Property Image URL (Optional)</label>
                     <input id="form-image" type="url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
                 </div>
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">Property Type</label>
-                    <select id="form-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-100 focus:outline-none">
-                        <option value="Single Family">🏡 Single Family</option>
-                        <option value="Modern Condo">🏢 Condo / Apartment</option>
-                        <option value="Luxury Villa">🌴 Luxury Villa</option>
-                    </select>
+                
+                <div class="border-t border-slate-800 pt-3 mt-2">
+                    <p class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider mb-2">🤝 Client Details (Optional)</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-slate-400 font-medium mb-1">Seller Name</label>
+                            <input id="form-seller-name" type="text" placeholder="John Doe" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 font-medium mb-1">Seller Phone/Email</label>
+                            <input id="form-seller-contact" type="text" placeholder="+1555..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div>
+                            <label class="block text-slate-400 font-medium mb-1">Target Buyer Name</label>
+                            <input id="form-buyer-name" type="text" placeholder="Jane Smith" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 font-medium mb-1">Buyer Max Budget</label>
+                            <input id="form-buyer-budget" type="number" placeholder="500000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="flex gap-2 justify-end mt-5 text-xs font-bold">
@@ -118,31 +144,51 @@
 
     <div id="pitch-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md p-5 rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-            <h3 class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-1.5">📢 Dynamic Pitch Configurator</h3>
+            <h3 class="text-sm font-bold text-slate-100 mb-3 flex items-center gap-1.5">📢 Dynamic CRM Pitch Engine</h3>
             
-            <div class="space-y-3 text-xs flex-1 overflow-y-auto pr-1">
+            <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 mb-3 text-xs font-bold">
+                <button id="mode-buyer" onclick="setPitchMode('buyer')" class="py-1.5 rounded-md text-cyan-400 bg-slate-900 border border-slate-800">For Potential Buyer</button>
+                <button id="mode-seller" onclick="setPitchMode('seller')" class="py-1.5 rounded-md text-slate-400 hover:text-slate-200">For Property Seller</button>
+            </div>
+
+            <div class="space-y-3 text-xs flex-1 overflow-y-auto pr-1 no-scrollbar">
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Agent Name</label>
+                    <label class="block text-slate-400 font-medium mb-1">Agent / Agency Signature</label>
                     <input id="pitch-agent" type="text" oninput="regeneratePitchText()" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
+
+                <div class="bg-slate-950/50 border border-slate-800/60 p-2.5 rounded-lg space-y-2">
+                    <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Live Database Connections</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Seller Info</label>
+                            <input id="pitch-seller-name" type="text" oninput="updateLiveClientData('sellerName')" class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Buyer Info</label>
+                            <input id="pitch-buyer-name" type="text" oninput="updateLiveClientData('buyerName')" class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px]">
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-slate-400 font-medium">Property Client Note</label>
-                        <button onclick="saveNoteToDatabase()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] tracking-wide uppercase px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 active:scale-95 transition-all">
-                            💾 Save Note to Site
+                        <label class="block text-slate-400 font-medium">Property Status Note</label>
+                        <button onclick="saveNoteToDatabase()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] uppercase px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/5 transition-all">
+                            💾 Save to Site
                         </button>
                     </div>
-                    <input id="pitch-note" type="text" oninput="regeneratePitchText()" placeholder="e.g., Highly motivated seller, quiet neighborhood..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
+                    <input id="pitch-note" type="text" oninput="regeneratePitchText()" placeholder="Add pipeline metrics or closing feedback details..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-slate-400 font-medium mb-1">Live Copy Preview</label>
-                    <textarea id="pitch-textarea" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none leading-relaxed"></textarea>
+                    <label class="block text-slate-400 font-medium mb-1">Compiled Layout Message</label>
+                    <textarea id="pitch-textarea" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none leading-relaxed"></textarea>
                 </div>
             </div>
 
             <div class="flex gap-2 justify-end mt-4 text-xs font-bold shrink-0">
                 <button onclick="closePitchModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg">Close</button>
-                <button onclick="executePitchShare()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 rounded-lg flex items-center gap-1 shadow-lg shadow-cyan-500/10">
+                <button onclick="executePitchShare()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 rounded-lg flex items-center gap-1">
                     🚀 Share / Copy
                 </button>
             </div>
@@ -157,44 +203,73 @@
         };
 
         const defaultSeed = [
-            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "", notes: "Located in the heart of the business district, skyview panorama." },
-            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "", notes: "Infinity pool setup, fully custom marble textures." },
-            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "", notes: "Huge backyard layout, brand new insulation roof fitted." }
+            { id: 1, title: "Modern Downtown Penthouse", price: 820000, type: "Modern Condo", stage: "active", img: "", notes: "Skyview panorama layout.", sellerName: "Marcus Vance", sellerContact: "marcus@vance.io", buyerName: "Alice Miller", buyerBudget: 850000 },
+            { id: 2, title: "Sunset Boulevard Villa", price: 2450000, type: "Luxury Villa", stage: "offer", img: "", notes: "Infinity pool setup.", sellerName: "Elena Rostova", sellerContact: "+1 (555) 019-2831", buyerName: "David Chen", buyerBudget: 2400000 },
+            { id: 3, title: "Suburban Family Estate", price: 540000, type: "Single Family", stage: "contract", img: "", notes: "Huge backyard layout.", sellerName: "Tom Geller", sellerContact: "tgeller@gmail.com", buyerName: "The Rodriguez Family", buyerBudget: 550000 }
         ];
 
         let listings = JSON.parse(localStorage.getItem('brokerflow_listings')) || defaultSeed;
-        let activePitchId = null; // Tracks target property ID explicitly instead of just copy context strings
+        let activePitchId = null;
+        let activePitchMode = 'buyer'; // 'buyer' or 'seller'
 
         function saveToStorage() { localStorage.setItem('brokerflow_listings', JSON.stringify(listings)); }
 
-        // Open Pitch Panel & pull saved notes directly from object state memory
         function openPitchModal(id) {
             const property = listings.find(p => p.id === id);
             if (!property) return;
 
             activePitchId = id;
+            activePitchMode = 'buyer'; // reset back to buyer view layout upon boot up
             
-            // Inject saved notes into the input if they exist
+            // Populate inputs
             document.getElementById('pitch-note').value = property.notes || '';
             document.getElementById('pitch-agent').value = localStorage.getItem('brokerflow_agent_name') || '';
+            document.getElementById('pitch-seller-name').value = property.sellerName || '';
+            document.getElementById('pitch-buyer-name').value = property.buyerName || '';
             
-            regeneratePitchText();
+            setPitchMode('buyer');
             document.getElementById('pitch-modal').classList.remove('hidden');
         }
 
         function closePitchModal() { document.getElementById('pitch-modal').classList.add('hidden'); }
 
-        // NEW MUTATOR: Save custom input descriptions down to database array strings
+        function setPitchMode(mode) {
+            activePitchMode = mode;
+            const bBtn = document.getElementById('mode-buyer');
+            const sBtn = document.getElementById('mode-seller');
+
+            if(mode === 'buyer') {
+                bBtn.className = "py-1.5 rounded-md text-cyan-400 bg-slate-900 border border-slate-800";
+                sBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+            } else {
+                sBtn.className = "py-1.5 rounded-md text-emerald-400 bg-slate-900 border border-slate-800";
+                bBtn.className = "py-1.5 rounded-md text-slate-400 hover:text-slate-200";
+            }
+            regeneratePitchText();
+        }
+
+        // Real-time listener that propagates modal updates directly back to array reference values
+        function updateLiveClientData(field) {
+            if (!activePitchId) return;
+            const value = document.getElementById(`pitch-${field.replace(/([A-Z])/g, '-$1').toLowerCase()}`).value.trim();
+            const index = listings.findIndex(p => p.id === activePitchId);
+            if(index !== -1) {
+                listings[index][field] = value;
+                saveToStorage();
+                // do not call full refresh here to protect active focus node indices
+            }
+            regeneratePitchText();
+        }
+
         function saveNoteToDatabase() {
             if (!activePitchId) return;
             const targetNote = document.getElementById('pitch-note').value.trim();
-            
             const index = listings.findIndex(p => p.id === activePitchId);
             if (index !== -1) {
                 listings[index].notes = targetNote;
                 saveToStorage();
-                renderDashboard(); // Re-render dashboard to update notes shown under the property cards
-                alert("💾 Note successfully saved to this listing in database storage!");
+                renderDashboard();
+                alert("💾 Pipeline notes synchronized!");
             }
         }
 
@@ -208,27 +283,35 @@
             
             if(agentName !== "Our Agent Desk") localStorage.setItem('brokerflow_agent_name', agentName);
 
-            let message = `🎯 HOT MARKET LISTING!\n\n`;
-            message += `✨ Type: ${property.type}\n`;
-            message += `📍 Location: ${property.title}\n`;
-            message += `💰 Asking Price: $${property.price.toLocaleString()} USD\n`;
-            
-            if (clientNote) {
-                message += `\n💡 Broker Note: "${clientNote}"\n`;
+            let msg = "";
+            if (activePitchMode === 'buyer') {
+                const buyerPlaceholder = property.buyerName ? `Hi ${property.buyerName},\n\n` : "Hello,\n\n";
+                msg += buyerPlaceholder;
+                msg += `🎯 EXCLUSIVE PROPERTY AVAILABILITY:\n`;
+                msg += `📍 Address: ${property.title}\n`;
+                msg += `💰 Market Value: $${property.price.toLocaleString()} USD\n`;
+                msg += `🏛️ Category: ${property.type}\n`;
+                if(clientNote) msg += `\n💡 Broker Insight: "${clientNote}"\n`;
+                msg += `\nBest regards,\n${agentName}`;
+            } else {
+                const sellerPlaceholder = property.sellerName ? `Hi ${property.sellerName},\n\n` : "Hello,\n\n";
+                msg += sellerPlaceholder;
+                msg += `📋 BRIEFING REPORT // PROPERTY DEAL PIPELINE:\n`;
+                msg += `📍 Asset: ${property.title}\n`;
+                msg += `⚡ Current Pipeline Stage: ${property.stage.toUpperCase()}\n`;
+                if(property.buyerName) msg += `👤 Active Lead Registered: ${property.buyerName}\n`;
+                if(clientNote) msg += `\n💡 Pipeline Note: "${clientNote}"\n`;
+                msg += `\nWe will continue pushing updates. Let me know if you have questions.\n\nBest,\n${agentName}`;
             }
-            
-            message += `\n💼 Connected via: ${agentName}\n`;
-            message += `Contact us today to arrange an exclusive private showing!`;
-            
-            document.getElementById('pitch-textarea').value = message;
+            document.getElementById('pitch-textarea').value = msg;
         }
 
         function executePitchShare() {
             const finalText = document.getElementById('pitch-textarea').value;
             if (navigator.share) {
-                navigator.share({ title: 'Property Pitch Information', text: finalText });
+                navigator.share({ title: 'BrokerFlow Information Transmission', text: finalText });
             } else {
-                navigator.clipboard.writeText(finalText).then(() => { alert("📋 Pitch copied to clipboard!"); });
+                navigator.clipboard.writeText(finalText).then(() => { alert("📋 Copied custom document context!"); });
             }
         }
 
@@ -237,7 +320,7 @@
             document.getElementById('col-offer').innerHTML = '';
             document.getElementById('col-contract').innerHTML = '';
 
-            const searchKeyword = document.getElementById('search-bar').value.toLowerCase();
+            const sK = document.getElementById('search-bar').value.toLowerCase();
             const filterType = document.getElementById('filter-type').value;
 
             let totalValue = 0;
@@ -245,7 +328,12 @@
             let visibleCount = 0;
 
             listings.forEach(item => {
-                const matchesSearch = item.title.toLowerCase().includes(searchKeyword);
+                // Expanded mobile fuzzy matcher checking title, seller profiles, or target buyers text match definitions
+                const matchTitle = item.title.toLowerCase().includes(sK);
+                const matchSeller = (item.sellerName || "").toLowerCase().includes(sK);
+                const matchBuyer = (item.buyerName || "").toLowerCase().includes(sK);
+                const matchesSearch = matchTitle || matchSeller || matchBuyer;
+                
                 const matchesType = (filterType === 'All' || item.type === filterType);
 
                 if (matchesSearch && matchesType) {
@@ -254,30 +342,42 @@
                     counts[item.stage]++;
 
                     const finalImg = item.img || typeImages[item.type] || typeImages["Single Family"];
+                    const safeTitle = item.title.replace(/'/g, "\\'");
 
                     const cardHTML = `
                         <div class="bg-slate-950 border border-slate-800 rounded-lg overflow-hidden shadow-md flex flex-col">
-                            <div class="w-full h-28 relative bg-slate-800">
-                                <img src="${finalImg}" alt="Property Image" class="w-full h-full object-cover">
-                                <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300 backdrop-blur-xs">${item.type}</span>
-                                <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px] transition-colors">🗑️</button>
+                            <div class="w-full h-24 relative bg-slate-800">
+                                <img src="${finalImg}" alt="Property Cover" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-950/80 text-slate-300">${item.type}</span>
+                                <button onclick="deleteListing(${item.id})" class="absolute top-2 right-2 bg-slate-950/80 hover:bg-rose-950 p-1.5 rounded-full text-[10px]">🗑️</button>
                             </div>
                             <div class="p-3 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.title}</h4>
                                     <p class="text-sm font-black text-slate-100 mt-0.5">$${item.price.toLocaleString()}</p>
                                     
-                                    ${item.notes ? `<p class="text-[10px] text-slate-400 italic mt-2 line-clamp-2 bg-slate-900/50 p-1.5 rounded border border-slate-800/40">📝 ${item.notes}</p>` : ''}
+                                    <div class="mt-2 pt-2 border-t border-slate-900 grid grid-cols-2 gap-1.5 text-[10px] bg-slate-900/30 p-1.5 rounded">
+                                        <div>
+                                            <span class="text-slate-500 font-bold block text-[8px] uppercase">Seller</span>
+                                            <span class="text-slate-300 font-medium line-clamp-1">${item.sellerName || 'None Listed'}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500 font-bold block text-[8px] uppercase">Potential Buyer</span>
+                                            <span class="text-slate-300 font-medium line-clamp-1">${item.buyerName || 'None Listed'}</span>
+                                        </div>
+                                    </div>
+
+                                    ${item.notes ? `<p class="text-[9px] text-slate-400 italic mt-2 line-clamp-1 bg-slate-900/60 p-1 rounded">📝 ${item.notes}</p>` : ''}
                                 </div>
-                                <div class="mt-3 space-y-2">
-                                    <button onclick="openPitchModal(${item.id})" class="w-full text-center bg-slate-900 border border-slate-800 hover:border-slate-700 p-1.5 text-[10px] rounded font-semibold text-cyan-400 flex items-center justify-center gap-1">
-                                        📢 Customize Client Pitch
+                                <div class="mt-3 space-y-1.5">
+                                    <button onclick="openPitchModal(${item.id})" class="w-full text-center bg-slate-900 border border-slate-800 p-1.5 text-[10px] rounded font-semibold text-cyan-400">
+                                        📢 Customize & Share Pitch
                                     </button>
-                                    <div class="pt-2 border-t border-slate-900 flex justify-between gap-1 text-[9px] font-bold">
-                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅ Late</button>` : '<div class="w-1"></div>'}
+                                    <div class="pt-1.5 flex justify-between gap-1 text-[9px] font-bold">
+                                        ${item.stage !== 'active' ? `<button onclick="updateStage(${item.id}, 'active')" class="text-cyan-400 bg-cyan-500/5 px-1.5 py-1 rounded border border-cyan-500/10">⬅️ Regress</button>` : '<div class="w-1"></div>'}
                                         ${item.stage === 'active' ? `<button onclick="updateStage(${item.id}, 'offer')" class="w-full text-center text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">Advance Offer ➡️</button>` : ''}
                                         ${item.stage === 'offer' ? `<button onclick="updateStage(${item.id}, 'contract')" class="w-full text-center text-purple-400 bg-purple-500/5 px-2 py-1 rounded border border-purple-500/10">Sign Contract ➡️</button>` : ''}
-                                        ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1 flex items-center gap-0.5">✨ Closing</span>` : ''}
+                                        ${item.stage === 'contract' ? `<span class="text-emerald-400 self-center pr-1">✨ Closed</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -309,17 +409,11 @@
 
         function updateStage(id, newStage) {
             const index = listings.findIndex(p => p.id === id);
-            if (index !== -1) {
-                listings[index].stage = newStage;
-                saveToStorage();
-                renderDashboard();
-            }
+            if (index !== -1) { listings[index].stage = newStage; saveToStorage(); renderDashboard(); }
         }
 
         function deleteListing(id) {
-            listings = listings.filter(p => p.id !== id);
-            saveToStorage();
-            renderDashboard();
+            listings = listings.filter(p => p.id !== id); saveToStorage(); renderDashboard();
         }
 
         function submitListing() {
@@ -327,21 +421,21 @@
             const price = parseInt(document.getElementById('form-price').value);
             const type = document.getElementById('form-type').value;
             const img = document.getElementById('form-image').value;
+            
+            const sellerName = document.getElementById('form-seller-name').value.trim();
+            const sellerContact = document.getElementById('form-seller-contact').value.trim();
+            const buyerName = document.getElementById('form-buyer-name').value.trim();
+            const buyerBudget = parseInt(document.getElementById('form-buyer-budget').value) || "";
 
-            if (!title || isNaN(price)) {
-                alert("Please complete required fields.");
-                return;
-            }
+            if (!title || isNaN(price)) { alert("Please complete required listing fields."); return; }
 
-            // New entries instantiate with blank notes fields
-            listings.push({ id: Date.now(), title, price, type, img, stage: 'active', notes: "" });
-            saveToStorage();
-            closeModal();
-            renderDashboard();
+            listings.push({ id: Date.now(), title, price, type, img, stage: 'active', notes: "", sellerName, sellerContact, buyerName, buyerBudget });
+            saveToStorage(); closeModal(); renderDashboard();
 
-            document.getElementById('form-title').value = '';
-            document.getElementById('form-price').value = '';
-            document.getElementById('form-image').value = '';
+            // Clear inputs
+            document.getElementById('form-title').value = ''; document.getElementById('form-price').value = ''; document.getElementById('form-image').value = '';
+            document.getElementById('form-seller-name').value = ''; document.getElementById('form-seller-contact').value = '';
+            document.getElementById('form-buyer-name').value = ''; document.getElementById('form-buyer-budget').value = '';
         }
 
         function openModal() { document.getElementById('property-modal').classList.remove('hidden'); }
