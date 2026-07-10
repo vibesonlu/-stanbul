@@ -9,7 +9,7 @@ This entire project was engineered and deployed completely on a mobile device ut
 ## 🚀 Live Demo
 
 Experience the mobile-optimized workflow dashboard live here:
-👉 **[View Live Dashboard]([https://vibesonlu.github.io/-stanbul/])**
+👉 **[View Live Dashboard](https://vibesonlu.github.io/-stanbul/)**
 
 ---
 
